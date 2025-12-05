@@ -1,0 +1,214 @@
+<!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20 relative z-10">
+        
+        <!-- Breadcrumbs & Meta -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 animate-fade-in-up">
+            <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+                <a href="index.html" class="hover:text-brand-400 transition-colors">Home</a>
+                <i class="ph-bold ph-caret-right text-xs"></i>
+                <a href="blog.html" class="hover:text-brand-400 transition-colors">Blog</a>
+                <i class="ph-bold ph-caret-right text-xs"></i>
+                <span class="text-slate-300">Astro & WordPress</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-4 mb-6">
+                <span class="bg-brand-900/30 text-brand-400 border border-brand-500/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Tutorial Técnico</span>
+                <span class="flex items-center gap-1 text-slate-400 text-sm"><i class="ph-bold ph-calendar-blank"></i> 12 Oct, 2023</span>
+                <span class="flex items-center gap-1 text-slate-400 text-sm"><i class="ph-bold ph-clock"></i> 8 min lectura</span>
+            </div>
+
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white leading-tight mb-8">
+                Cómo conectar Astro con WordPress vía <span class="text-gradient">REST API</span>
+            </h1>
+
+            <!-- Author Mini Profile -->
+            <div class="flex items-center gap-4 py-6 border-y border-white/5">
+                <div class="w-12 h-12 rounded-full bg-slate-800 overflow-hidden border border-brand-500/30">
+                     <div class="w-full h-full flex items-center justify-center bg-slate-700 text-slate-400">
+                         <i class="ph-fill ph-user text-2xl"></i>
+                     </div>
+                </div>
+                <div>
+                    <div class="text-white font-bold">Luis Angel Gutierrez</div>
+                    <div class="text-slate-500 text-sm">Full Stack Developer</div>
+                </div>
+                <div class="ml-auto flex gap-3">
+                    <button class="w-10 h-10 rounded-full bg-dark-card border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-brand-600 hover:border-brand-500 transition-all" title="Compartir en X">
+                        <i class="ph-bold ph-x-logo"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-dark-card border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 hover:border-blue-500 transition-all" title="Compartir en LinkedIn">
+                        <i class="ph-bold ph-linkedin-logo"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Image -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="aspect-[21/9] bg-slate-800 rounded-3xl overflow-hidden relative shadow-2xl shadow-black/50 border border-white/5">
+                <!-- Placeholder visual -->
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                    <i class="ph ph-rocket-launch text-8xl text-slate-700"></i>
+                </div>
+                <!-- Overlay effect -->
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent"></div>
+            </div>
+        </div>
+
+        <!-- Layout Grid: Sidebar + Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Left Sidebar (Table of Contents) - Hidden on Mobile -->
+                <aside class="hidden lg:block lg:col-span-3">
+                    <div class="sticky top-28 space-y-8">
+                        <div>
+                            <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                                <i class="ph-bold ph-list-dashes text-brand-500"></i> En este artículo
+                            </h4>
+                            <nav class="space-y-1 relative border-l border-slate-800 ml-2">
+                                <a href="#intro" class="block pl-4 py-1 text-sm text-brand-400 border-l-2 border-brand-500 -ml-[1px]">Introducción</a>
+                                <a href="#config-wp" class="block pl-4 py-1 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">Configurando WordPress</a>
+                                <a href="#astro-fetch" class="block pl-4 py-1 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">Fetching de datos en Astro</a>
+                                <a href="#dynamic-routes" class="block pl-4 py-1 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">Rutas Dinámicas</a>
+                                <a href="#conclusion" class="block pl-4 py-1 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">Conclusión</a>
+                            </nav>
+                        </div>
+
+                        <!-- Banner Promocional Lateral -->
+                        <div class="bg-gradient-to-br from-brand-900/50 to-purple-900/50 p-6 rounded-2xl border border-white/10">
+                            <h5 class="text-white font-bold mb-2">¿Necesitas ayuda?</h5>
+                            <p class="text-xs text-slate-300 mb-4">Puedo ayudarte a migrar tu sitio a esta arquitectura.</p>
+                            <a href="index.html#contact" class="block w-full py-2 bg-white text-brand-950 text-center text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors">Contactar</a>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Content Column -->
+                <article class="lg:col-span-7 blog-content animate-fade-in-up" style="animation-delay: 0.2s;">
+                    
+                    <p class="lead text-xl text-slate-200 mb-8" id="intro">
+                        El desarrollo web moderno tiende hacia la arquitectura <strong>Headless</strong>. En este tutorial, aprenderemos a combinar la potencia de edición de WordPress con la velocidad inigualable de Astro para crear un blog estático que vuela.
+                    </p>
+
+                    <p>
+                        Muchos clientes adoran la interfaz de administración de WordPress pero odian la lentitud y las vulnerabilidades de seguridad que a menudo conlleva. Astro llega para solucionar esto, permitiéndonos generar HTML estático en el momento de la compilación.
+                    </p>
+
+                    <h2 id="config-wp">1. Configurando WordPress</h2>
+                    <p>
+                        Lo primero que necesitamos es asegurarnos de que WordPress exponga los datos correctamente. Por defecto, la REST API ya viene activada, pero para este proyecto usaremos <strong>ACF (Advanced Custom Fields)</strong> para añadir campos extra a nuestros posts.
+                    </p>
+                    
+                    <blockquote>
+                        "La separación de preocupaciones (SoC) entre el backend y el frontend no es solo una moda, es una necesidad para la escalabilidad."
+                    </blockquote>
+
+                    <h2 id="astro-fetch">2. Fetching de datos en Astro</h2>
+                    <p>
+                        Astro hace que el fetching de datos sea increíblemente sencillo gracias a su soporte de <code>top-level await</code>. Aquí tienes un ejemplo de cómo obtener los posts:
+                    </p>
+
+                    <!-- Code Block Simulation -->
+                    <div class="relative group">
+                        <div class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="text-xs bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded border border-white/10">Copiar</button>
+                        </div>
+                        <!-- <pre><code class="language-javascript">---
+// src/pages/index.astro
+const res = await fetch("https://tu-dominio.com/wp-json/wp/v2/posts?_embed");
+const posts = await res.json();
+---
+
+&lt;h1&gt;Mis Artículos&lt;/h1&gt;
+&lt;ul&gt;
+  {posts.map((post) => (
+    &lt;li&gt;
+      &lt;a href={`/blog/${post.slug}`}&gt;
+        &lt;h2 set:html={post.title.rendered} /&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  ))}
+&lt;/ul&gt;</code></pre> -->
+                    </div>
+
+                    <h3 id="dynamic-routes">Generando Rutas Dinámicas</h3>
+                    <p>
+                        Para generar las páginas individuales (como la que estás leyendo ahora), usamos la función <code>getStaticPaths()</code> de Astro. Esto le dice al compilador cuántas páginas HTML debe generar basándose en los datos de la API.
+                    </p>
+
+                    <ul>
+                        <li>Consultar todos los posts de la API.</li>
+                        <li>Mapear cada post a un parámetro <code>slug</code>.</li>
+                        <li>Pasar los datos del post como <code>props</code> a la página.</li>
+                    </ul>
+
+                    <h2 id="conclusion">Conclusión</h2>
+                    <p>
+                        Esta combinación es ganadora. Obtienes un <strong>Lighthouse Score de 100</strong> casi sin esfuerzo, seguridad de grado militar (ya que WP no está expuesto al público directamente) y la experiencia de edición que tus clientes ya conocen.
+                    </p>
+                    
+                    <p>
+                        En el próximo artículo veremos cómo manejar la paginación y las categorías. ¡Suscríbete para no perdértelo!
+                    </p>
+
+                </article>
+
+                <!-- Right Sidebar (Could be empty or related) -->
+                <div class="hidden lg:block lg:col-span-2"></div>
+            </div>
+        </div>
+
+        <!-- Section: Related Posts -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 pt-12 border-t border-white/5">
+            <h3 class="text-2xl font-heading font-bold text-white mb-8">También te puede interesar</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Related Card 1 -->
+                <a href="#" class="group block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full">
+                        <div class="h-40 bg-slate-800 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-brand-400 transition-colors line-clamp-2">
+                                Optimización de imágenes en Astro
+                            </h4>
+                            <span class="text-sm text-slate-500">Leer artículo <i class="ph-bold ph-arrow-right ml-1"></i></span>
+                        </div>
+                    </article>
+                </a>
+
+                <!-- Related Card 2 -->
+                <a href="#" class="group block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full">
+                        <div class="h-40 bg-slate-800 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-brand-400 transition-colors line-clamp-2">
+                                Campos Repetidores en ACF Pro
+                            </h4>
+                            <span class="text-sm text-slate-500">Leer artículo <i class="ph-bold ph-arrow-right ml-1"></i></span>
+                        </div>
+                    </article>
+                </a>
+
+                <!-- Related Card 3 -->
+                <a href="#" class="group block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full">
+                        <div class="h-40 bg-slate-800 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-brand-400 transition-colors line-clamp-2">
+                                Despliegue automático en Vercel
+                            </h4>
+                            <span class="text-sm text-slate-500">Leer artículo <i class="ph-bold ph-arrow-right ml-1"></i></span>
+                        </div>
+                    </article>
+                </a>
+            </div>
+        </section>
+
+    </main>

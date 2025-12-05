@@ -1,0 +1,119 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+
+---
+<Layout title="Política de Privacidad">
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20 relative z-10">
+        
+        <!-- Header Simple -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 animate-fade-in-up text-center">
+            <h1 class="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+                Política de <span class="text-gradient">Privacidad</span>
+            </h1>
+            <p class="text-slate-400 text-lg">
+                Tu privacidad es importante. Aquí explicamos cómo recopilamos, usamos y protegemos tus datos.
+            </p>
+            <div class="mt-4 text-sm text-slate-500 font-mono">
+                Última actualización: 12 de Octubre, 2024
+            </div>
+        </div>
+
+        <!-- Layout Grid: Sidebar + Legal Text -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Sidebar de Navegación (Sticky) -->
+                <aside class="hidden lg:block lg:col-span-3">
+                    <div class="sticky top-28 space-y-8">
+                        <div>
+                            <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                                <i class="ph-bold ph-shield-check text-brand-500"></i> Contenido
+                            </h4>
+                            <nav class="space-y-1 relative border-l border-slate-800 ml-2">
+                                <a href="#info-collect" class="block pl-4 py-2 text-sm text-brand-400 border-l-2 border-brand-500 -ml-[1px] font-medium transition-all">1. Información Recopilada</a>
+                                <a href="#uso-datos" class="block pl-4 py-2 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">2. Uso de la Información</a>
+                                <a href="#cookies" class="block pl-4 py-2 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">3. Cookies</a>
+                                <a href="#terceros" class="block pl-4 py-2 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">4. Terceros</a>
+                                <a href="#derechos" class="block pl-4 py-2 text-sm text-slate-400 hover:text-white border-l-2 border-transparent hover:border-brand-500/50 -ml-[1px] transition-all">5. Tus Derechos</a>
+                            </nav>
+                        </div>
+
+                        <div class="bg-dark-card p-6 rounded-2xl border border-white/5">
+                            <p class="text-xs text-slate-400 mb-2">¿Más información?</p>
+                            <a href="terms.html" class="text-sm font-bold text-white hover:text-brand-400 flex items-center gap-2">
+                                Ver Términos de Uso <i class="ph-bold ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Legal Content Column -->
+                <article class="lg:col-span-7 legal-content bg-dark-card/50 p-8 md:p-12 rounded-3xl border border-white/5 animate-fade-in-up" style="animation-delay: 0.1s;">
+                    
+                    <h2 id="info-collect" class="!mt-0">1. Información que Recopilamos</h2>
+                    <p>
+                        En el sitio web de <strong>Luis Angel Gutierrez</strong>, podemos recopilar información de dos tipos:
+                    </p>
+                    <ul>
+                        <li><strong>Información proporcionada directamente:</strong> Como tu nombre y correo electrónico cuando utilizas el formulario de contacto.</li>
+                        <li><strong>Información recopilada automáticamente:</strong> Datos de navegación, dirección IP, tipo de navegador y páginas visitadas a través de herramientas de análisis.</li>
+                    </ul>
+
+                    <h2 id="uso-datos">2. Uso de la Información</h2>
+                    <p>
+                        Utilizamos la información recopilada para los siguientes propósitos:
+                    </p>
+                    <ul>
+                        <li>Responder a tus consultas enviadas a través del formulario de contacto.</li>
+                        <li>Mejorar la experiencia de usuario y la optimización técnica del sitio web.</li>
+                        <li>Analizar tendencias de tráfico para la creación de contenido relevante en el blog.</li>
+                    </ul>
+                    <p>
+                        Nunca venderemos ni alquilaremos tu información personal a terceros con fines comerciales.
+                    </p>
+
+                    <h2 id="cookies">3. Política de Cookies</h2>
+                    <p>
+                        Este sitio utiliza cookies para mejorar la navegación. Una cookie es un pequeño archivo de texto que se almacena en tu navegador.
+                    </p>
+                    <p>
+                        Utilizamos cookies principalmente para análisis estadístico (como Google Analytics) para entender cómo los visitantes interactúan con el sitio. Puedes configurar tu navegador para rechazar todas las cookies o para que te avise cuando se envía una cookie.
+                    </p>
+
+                    <h2 id="terceros">4. Enlaces a Terceros</h2>
+                    <p>
+                        Nuestro sitio puede contener enlaces a otros sitios web (como GitHub, LinkedIn o demostraciones de proyectos) que no son operados por nosotros.
+                    </p>
+                    <p>
+                        Si haces clic en un enlace de un tercero, serás dirigido al sitio de ese tercero. Te recomendamos encarecidamente que revises la Política de Privacidad de cada sitio que visites. No tenemos control ni asumimos responsabilidad por el contenido, las políticas de privacidad o las prácticas de sitios o servicios de terceros.
+                    </p>
+
+                    <h2 id="derechos">5. Tus Derechos</h2>
+                    <p>
+                        Tienes derecho a acceder, rectificar o solicitar la eliminación de tu información personal que hayamos recopilado (principalmente correos de contacto). Para ejercer estos derechos, por favor contáctanos.
+                    </p>
+
+                    <div class="mt-8 pt-8 border-t border-white/10">
+                        <h3 class="text-white font-bold text-lg mb-4">Contacto de Privacidad</h3>
+                        <div class="flex items-center gap-4 p-4 bg-brand-900/20 border border-brand-500/20 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white">
+                                <i class="ph-fill ph-shield-check"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-slate-400">Responsable de Datos</div>
+                                <a href="mailto:privacy@luisangel.dev" class="text-white hover:text-brand-400 font-medium transition-colors">privacy@luisangel.dev</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </article>
+
+                <!-- Right Space -->
+                <div class="hidden lg:block lg:col-span-2"></div>
+            </div>
+        </div>
+
+    </main>
+</Layout>

@@ -1,0 +1,83 @@
+<!-- Blog Preview Section -->
+    <section id="blog" class="relative z-10 py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-12 text-center">
+                Últimos <span class="text-brand-500">Artículos</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- WP Loop: Blog Posts (Limit 3) -->
+                
+                <!-- Post 1 -->
+                <a href="#" class="group block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
+                        <div class="h-48 bg-slate-800 relative overflow-hidden">
+                            <!-- Featured Image -->
+                            <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
+                                <span class="text-brand-400">Tutorial</span> • 12 Oct, 2023
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
+                                Cómo conectar Astro con WordPress vía REST API
+                            </h3>
+                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
+                                Guía paso a paso para configurar endpoints en WordPress y consumirlos eficientemente en Astro 4.0.
+                            </p>
+                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
+                            </span>
+                        </div>
+                    </article>
+                </a>
+
+                <!-- Post 2 -->
+                <a href="#" class="group block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
+                        <div class="h-48 bg-slate-800 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
+                                <span class="text-brand-400">ACF</span> • 28 Sep, 2023
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
+                                Campos flexibles vs Repetidores en ACF
+                            </h3>
+                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
+                                Analizamos cuándo utilizar Flexible Content o Repeater Fields para estructurar tu contenido de manera óptima.
+                            </p>
+                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
+                            </span>
+                        </div>
+                    </article>
+                </a>
+                
+                <!-- Post 3 (Hidden on mobile, shown on lg) -->
+                <a href="#" class="group hidden lg:block">
+                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
+                        <div class="h-48 bg-slate-800 relative overflow-hidden">
+                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
+                                <span class="text-brand-400">CSS</span> • 15 Sep, 2023
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
+                                Dominando Grid Layout con Tailwind
+                            </h3>
+                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
+                                Trucos y mejores prácticas para crear layouts complejos responsive sin escribir CSS personalizado.
+                            </p>
+                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
+                            </span>
+                        </div>
+                    </article>
+                </a>
+
+            </div>
+        </div>
+    </section>

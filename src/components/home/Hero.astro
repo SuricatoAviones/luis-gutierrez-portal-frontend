@@ -1,0 +1,131 @@
+<!-- Hero Section -->
+<section
+  id="home"
+  class="relative z-10 min-h-screen flex items-center justify-center pt-20"
+>
+  <div
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center"
+  >
+    <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+      <span
+        class="px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-400 text-sm font-medium tracking-wide"
+      >
+        Disponible para trabajar
+      </span>
+    </div>
+
+    <h1
+      class="text-5xl md:text-7xl font-heading font-extrabold text-white mb-6 tracking-tight animate-fade-in-up"
+      style="animation-delay: 0.2s;"
+    >
+      Hola, soy <br class="md:hidden" />
+      <span class="text-gradient">Luis Angel Gutierrez</span>
+    </h1>
+
+    <p
+      class="mt-4 max-w-2xl text-xl text-slate-400 animate-fade-in-up"
+      style="animation-delay: 0.3s;"
+    >
+      Desarrollador Full Stack especializado en crear experiencias digitales
+      modernas y escalables. Construyo soluciones con <span
+        class="text-white font-semibold">WordPress Headless</span
+      > y <span class="text-white font-semibold">Astro</span>.
+    </p>
+
+    <div
+      class="mt-10 flex flex-col sm:flex-row gap-4 animate-fade-in-up"
+      style="animation-delay: 0.4s;"
+    >
+      <a
+        href="#projects"
+        class="px-8 py-3.5 rounded-full bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
+      >
+        Ver Proyectos <i class="ph-bold ph-arrow-right"></i>
+      </a>
+      <a
+        href="#contact"
+        class="px-8 py-3.5 rounded-full border border-slate-700 text-slate-300 hover:border-white hover:text-white transition-all bg-white/5 backdrop-blur-sm flex items-center justify-center gap-2"
+      >
+        <i class="ph-bold ph-envelope"></i> Contáctame
+      </a>
+    </div>
+
+    <!-- Social Links -->
+    <div
+      class="mt-12 flex gap-6 text-slate-400 animate-fade-in-up"
+      style="animation-delay: 0.5s;"
+    >
+      <a
+        href="#"
+        class="hover:text-brand-400 transition-colors hover:scale-110 transform duration-200"
+        ><i class="ph-fill ph-github-logo text-3xl"></i></a
+      >
+      <a
+        href="#"
+        class="hover:text-brand-400 transition-colors hover:scale-110 transform duration-200"
+        ><i class="ph-fill ph-linkedin-logo text-3xl"></i></a
+      >
+      <a
+        href="#"
+        class="hover:text-brand-400 transition-colors hover:scale-110 transform duration-200"
+        ><i class="ph-fill ph-instagram-logo text-3xl"></i></a
+      >
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div
+    class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce"
+  >
+    <a
+      href="#experience"
+      class="text-slate-500 hover:text-white transition-colors"
+    >
+      <i class="ph-bold ph-mouse-simple text-3xl"></i>
+    </a>
+  </div>
+</section>
+<!-- Scripts simples para funcionalidad básica -->
+<script>
+  // Mobile Menu Toggle
+  const btn = document.getElementById("mobile-menu-btn");
+  const menu = document.getElementById("mobile-menu");
+
+  btn.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+
+  // Sticky Navbar effect
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 20) {
+      navbar.classList.add("shadow-lg");
+      navbar.classList.add("shadow-brand-900/10");
+    } else {
+      navbar.classList.remove("shadow-lg");
+      navbar.classList.remove("shadow-brand-900/10");
+    }
+  });
+
+  // Simple Fade In Animation on Scroll (Intersection Observer)
+  const observerOptions = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.1,
+  };
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("animate-fade-in-up");
+        entry.target.style.opacity = 1; // Ensure visibility
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll("section > div").forEach((section) => {
+    section.style.opacity = 0; // Initial state
+    observer.observe(section);
+  });
+</script>
