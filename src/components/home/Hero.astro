@@ -10,7 +10,7 @@
       <span
         class="px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-400 text-sm font-medium tracking-wide"
       >
-        Disponible para trabajar
+        Full Stack Developer
       </span>
     </div>
 
@@ -85,47 +85,4 @@
     </a>
   </div>
 </section>
-<!-- Scripts simples para funcionalidad básica -->
-<script>
-  // Mobile Menu Toggle
-  const btn = document.getElementById("mobile-menu-btn");
-  const menu = document.getElementById("mobile-menu");
 
-  btn.addEventListener("click", () => {
-    menu.classList.toggle("hidden");
-  });
-
-  // Sticky Navbar effect
-  const navbar = document.getElementById("navbar");
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 20) {
-      navbar.classList.add("shadow-lg");
-      navbar.classList.add("shadow-brand-900/10");
-    } else {
-      navbar.classList.remove("shadow-lg");
-      navbar.classList.remove("shadow-brand-900/10");
-    }
-  });
-
-  // Simple Fade In Animation on Scroll (Intersection Observer)
-  const observerOptions = {
-    root: null,
-    rootMargin: "0px",
-    threshold: 0.1,
-  };
-
-  const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("animate-fade-in-up");
-        entry.target.style.opacity = 1; // Ensure visibility
-        observer.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-
-  document.querySelectorAll("section > div").forEach((section) => {
-    section.style.opacity = 0; // Initial state
-    observer.observe(section);
-  });
-</script>

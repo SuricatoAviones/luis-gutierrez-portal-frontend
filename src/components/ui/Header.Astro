@@ -1,90 +1,155 @@
+<nav
+  class="fixed w-full z-50 glass-nav transition-all duration-300"
+  id="navbar"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <div class="shrink-0">
+        <a
+          href="#"
+          class="font-heading font-bold text-2xl text-white tracking-wider hover:text-brand-400 transition-colors"
+        >
+          LUIS<span class="text-brand-500">.</span>DEV
+        </a>
+      </div>
 
-
-
-<nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="shrink-0">
-                    <a href="#" class="font-heading font-bold text-2xl text-white tracking-wider hover:text-brand-400 transition-colors">
-                        LUIS<span class="text-brand-500">.</span>DEV
-                    </a>
-                </div>
-                
-                <!-- Desktop Menu -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#home" class="text-white hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="#experience" class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Experiencia</a>
-                        <a href="#projects" class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Proyectos</a>
-                        <a href="#skills" class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Skills</a>
-                        <a href="#blog" class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Blog</a>
-                        <a href="#contact" class="bg-brand-600 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-700 transition-all shadow-lg shadow-brand-900/50">Contacto</a>
-                    </div>
-                </div>
-
-                <!-- Mobile menu button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
-                        <i class="ph ph-list text-2xl"></i>
-                    </button>
-                </div>
-            </div>
+      <!-- Desktop Menu -->
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-8">
+          <a
+            href="#home"
+            class="text-white hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >Home</a
+          >
+          <a
+            href="#experience"
+            class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >Experiencia</a
+          >
+          <a
+            href="#projects"
+            class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >Proyectos</a
+          >
+          <a
+            href="#skills"
+            class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >Skills</a
+          >
+          <a
+            href="#blog"
+            class="text-slate-300 hover:text-brand-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >Blog</a
+          >
+          <a
+            href="#contact"
+            class="bg-brand-600 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-700 transition-all shadow-lg shadow-brand-900/50"
+            >Contacto</a
+          >
         </div>
+      </div>
 
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-brand-950 border-b border-white/10">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#home" class="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Home</a>
-                <a href="#experience" class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Experiencia</a>
-                <a href="#projects" class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Proyectos</a>
-                <a href="#skills" class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Skills</a>
-                <a href="#blog" class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Blog</a>
-                <a href="#contact" class="text-brand-400 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5">Contacto</a>
-            </div>
-        </div>
-    </nav>
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button
+          id="mobile-menu-btn"
+          class="text-slate-300 hover:text-white p-2"
+        >
+          <i class="ph ph-list text-2xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <!-- Scripts simples para funcionalidad básica -->
-    <script>
-        // Mobile Menu Toggle
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
+  <!-- Mobile Menu Panel -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden bg-brand-950 border-b border-white/10"
+  >
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <a
+        href="#home"
+        class="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Home</a
+      >
+      <a
+        href="#experience"
+        class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Experiencia</a
+      >
+      <a
+        href="#projects"
+        class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Proyectos</a
+      >
+      <a
+        href="#skills"
+        class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Skills</a
+      >
+      <a
+        href="#blog"
+        class="text-slate-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Blog</a
+      >
+      <a
+        href="#contact"
+        class="text-brand-400 block px-3 py-2 rounded-md text-base font-medium hover:bg-white/5"
+        >Contacto</a
+      >
+    </div>
+  </div>
+</nav>
 
-        btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
-        });
+<!-- Scripts simples para funcionalidad básica -->
+<script>
+  // Mobile Menu Toggle
+  const btn = document.getElementById("mobile-menu-btn");
+  const menu = document.getElementById("mobile-menu");
 
-        // Sticky Navbar effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 20) {
-                navbar.classList.add('shadow-lg');
-                navbar.classList.add('shadow-brand-900/10');
-            } else {
-                navbar.classList.remove('shadow-lg');
-                navbar.classList.remove('shadow-brand-900/10');
-            }
-        });
+  if (btn && menu) {
+    btn.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
+  }
 
-        // Simple Fade In Animation on Scroll (Intersection Observer)
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
+  // Sticky Navbar effect
+  const navbar = document.getElementById("navbar");
+  if (navbar) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add("shadow-lg");
+        navbar.classList.add("shadow-brand-900/10");
+      } else {
+        navbar.classList.remove("shadow-lg");
+        navbar.classList.remove("shadow-brand-900/10");
+      }
+    });
+  }
 
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in-up');
-                    entry.target.style.opacity = 1; // Ensure visibility
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+  // Simple Fade In Animation on Scroll (Intersection Observer)
+  const observerOptions = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.1,
+  };
 
-        document.querySelectorAll('section > div').forEach((section) => {
-            section.style.opacity = 0; // Initial state
-            observer.observe(section);
-        });
-    </script>
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("animate-fade-in-up");
+        if (entry.target instanceof HTMLElement) {
+          entry.target.style.opacity = "1"; // Ensure visibility
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll("section > div").forEach((section) => {
+    if (section instanceof HTMLElement) {
+      section.style.opacity = "0"; // Initial state
+      observer.observe(section);
+    }
+  });
+</script>
