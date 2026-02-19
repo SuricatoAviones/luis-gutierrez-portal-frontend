@@ -1,19 +1,49 @@
 ---
+// src/components/Footer.astro
+const year = new Date().getFullYear();
 
+const socialLinks = [
+  { href: 'https://github.com/tu-usuario',           label: 'GitHub' },
+  { href: 'https://linkedin.com/in/tu-usuario',      label: 'LinkedIn' },
+  { href: 'https://twitter.com/tu-usuario',          label: 'Twitter/X' },
+];
 ---
-<!-- Footer -->
-    <footer class="bg-black py-12 border-t border-white/5 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <span class="font-heading font-bold text-xl text-white tracking-wider">
-                    LUIS<span class="text-brand-500">.</span>DEV
-                </span>
-                <p class="text-slate-500 text-sm mt-2">© {new Date().getFullYear()} Luis Angel Gutierrez. Todos los derechos reservados.</p>
-            </div>
-            
-            <div class="flex gap-6">
-                <a href="#" class="text-slate-500 hover:text-white transition-colors text-sm">Privacidad</a>
-                <a href="#" class="text-slate-500 hover:text-white transition-colors text-sm">Términos</a>
-            </div>
-        </div>
-    </footer>
+
+<footer class="border-t border-border bg-parchment">
+  <div class="max-w-content mx-auto px-6 lg:px-10 py-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+      <!-- Logo + tagline -->
+      <div>
+        <a href="/" class="font-display text-xl font-semibold text-ink hover:text-accent transition-colors">
+          LAG<span class="text-accent">.</span>
+        </a>
+        <p class="mt-1 text-sm text-muted">Desarrollador Full Stack · Construyendo con propósito.</p>
+      </div>
+
+      <!-- Links sociales -->
+      <div class="flex items-center gap-6">
+        {socialLinks.map(({ href, label }) => (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-muted hover:text-ink transition-colors duration-200"
+          >
+            {label}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Línea inferior -->
+    <div class="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <p class="text-xs text-muted">
+        © {year} Luis Angel Gutierrez. Todos los derechos reservados.
+      </p>
+      <p class="text-xs text-muted">
+        Construido con <span class="text-accent">Astro</span> + <span class="text-accent">Tailwind</span>
+      </p>
+    </div>
+  </div>
+</footer>

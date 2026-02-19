@@ -1,0 +1,73 @@
+---
+// src/components/sections/About.astro
+---
+
+<section id="sobre-mi" class="py-24 lg:py-32">
+  <div class="max-w-content mx-auto px-6 lg:px-10">
+
+    <!-- Encabezado de sección -->
+    <div class="flex items-center gap-4 mb-16 reveal">
+      <span class="font-mono text-2xs text-accent uppercase tracking-widest">01</span>
+      <span class="block w-8 h-px bg-accent"></span>
+      <h2 class="font-display text-3xl lg:text-4xl font-semibold text-ink">Sobre mí</h2>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+
+      <!-- Texto principal -->
+      <div class="lg:col-span-7 space-y-6 reveal">
+        <p class="text-lg text-ink font-light leading-relaxed">
+          Soy <strong class="font-semibold">Luis Angel Gutierrez</strong>, desarrollador
+          Full Stack con pasión por construir productos digitales que combinen
+          funcionalidad robusta con una interfaz que deleite al usuario.
+        </p>
+        <p class="text-base text-muted leading-relaxed">
+          Mi stack principal gira alrededor del ecosistema JavaScript moderno —
+          React, Next.js y Node.js — complementado con bases de datos relacionales
+          y no relacionales. Me interesa la arquitectura de software limpia, los
+          sistemas escalables y el diseño de APIs bien pensadas.
+        </p>
+        <p class="text-base text-muted leading-relaxed">
+          Fuera del código, aprendo continuamente: cursos, papers, open source.
+          Creo firmemente que un buen desarrollador es, ante todo, un buen
+          comunicador y un buen pensador.
+        </p>
+
+        <!-- Descarga CV -->
+        <div class="pt-4">
+          <a
+            href="/cv-luis-angel-gutierrez.pdf"
+            download
+            class="inline-flex items-center gap-2 text-sm font-medium text-accent border-b border-accent/40 hover:border-accent pb-0.5 transition-colors duration-200"
+          >
+            Descargar CV
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Panel de info rápida -->
+      <div class="lg:col-span-5 reveal [animation-delay:150ms]">
+        <div class="bg-accent-light rounded-2xl p-8 space-y-5">
+          <h3 class="font-display text-lg font-semibold text-ink">En pocas palabras</h3>
+
+          {[
+            { label: 'Ubicación',    value: 'México' },
+            { label: 'Especialidad', value: 'Full Stack Development' },
+            { label: 'Disponible',   value: 'Para proyectos freelance / remoto' },
+            { label: 'Idiomas',      value: 'Español (nativo) · Inglés (avanzado)' },
+            { label: 'Intereses',    value: 'Arquitectura web, UX, Open Source' },
+          ].map(({ label, value }) => (
+            <div class="flex flex-col gap-0.5">
+              <span class="font-mono text-2xs text-muted uppercase tracking-wider">{label}</span>
+              <span class="text-sm text-ink font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

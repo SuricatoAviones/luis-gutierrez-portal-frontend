@@ -1,45 +1,160 @@
-<!-- Experience Section (ACF Repeater Area) -->
-    <section id="experience" class="relative z-10 py-24 bg-brand-950/50">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-16 text-center">
-                Experiencia <span class="text-brand-500">Laboral</span>
-            </h2>
+---
+// src/components/sections/Experience.astro
+import { getExperiences, formatDate, parseTechs } from '../../lib/wordpress';
+import type { Experience } from '../../lib/wordpress';
 
-            <div class="relative border-l border-slate-800 ml-4 md:ml-0 space-y-12">
-                
-                <!-- WP ACF: Start Experience Loop -->
-                
-                <!-- Item 1 -->
-                <div class="relative pl-8 md:pl-12 group">
-                    <!-- Dot -->
-                    <span class="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-brand-500 ring-4 ring-brand-950 group-hover:ring-brand-500/30 transition-all"></span>
-                    
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                        <h3 class="text-xl font-bold text-white group-hover:text-brand-400 transition-colors">Senior Web Developer</h3>
-                        <span class="text-sm text-slate-500 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-800 mt-1 sm:mt-0 w-fit">2022 - Presente</span>
+const fallbackExperiences: Experience[] = [
+  {
+    id: 1,
+    title: { rendered: 'Desarrollador Full Stack Senior' },
+    acf: {
+      company: 'Empresa Tech S.A.',
+      position: 'Full Stack Developer Sr.',
+      start_date: '2022-03',
+      end_date: 'presente',
+      description:
+        'Lideré el desarrollo de una plataforma SaaS con más de 10,000 usuarios activos. Arquitecté el backend en Node.js y el frontend en React, mejorando el tiempo de carga en un 40%.',
+      technologies: 'React, Node.js, TypeScript, PostgreSQL, Redis, AWS',
+      company_url: 'https://empresa.com',
+    },
+  },
+  {
+    id: 2,
+    title: { rendered: 'Desarrollador Frontend' },
+    acf: {
+      company: 'Agencia Digital XYZ',
+      position: 'Frontend Developer',
+      start_date: '2020-06',
+      end_date: '2022-02',
+      description:
+        'Desarrollé interfaces para más de 15 clientes. Implementé design systems con Storybook y migré proyectos legacy a React con mejoras significativas de rendimiento.',
+      technologies: 'React, Vue.js, SASS, Webpack, Figma',
+      company_url: '#',
+    },
+  },
+  {
+    id: 3,
+    title: { rendered: 'Desarrollador WordPress' },
+    acf: {
+      company: 'Freelance',
+      position: 'WordPress Developer',
+      start_date: '2019-01',
+      end_date: '2020-05',
+      description:
+        'Creé sitios web y tiendas en línea con WordPress y WooCommerce. Desarrollo de plugins personalizados y temas a medida para clientes de distintos sectores.',
+      technologies: 'WordPress, PHP, ACF, WooCommerce, CSS',
+      company_url: '',
+    },
+  },
+];
+
+let experiences = fallbackExperiences;
+
+try {
+  const fetched = await getExperiences();
+  if (fetched.length > 0) experiences = fetched;
+} catch {
+  // Usa fallback
+}
+---
+
+<section id="experiencia" class="py-24 lg:py-32 bg-parchment">
+  <div class="max-w-content mx-auto px-6 lg:px-10">
+
+    <!-- Encabezado de sección -->
+    <div class="flex items-center gap-4 mb-16 reveal">
+      <span class="font-mono text-2xs text-accent uppercase tracking-widest">04</span>
+      <span class="block w-8 h-px bg-accent"></span>
+      <h2 class="font-display text-3xl lg:text-4xl font-semibold text-ink">Experiencia</h2>
+    </div>
+
+    <!-- Timeline -->
+    <div class="relative">
+      <!-- Línea vertical -->
+      <div class="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-accent via-border to-transparent" aria-hidden="true"></div>
+
+      <div class="space-y-12">
+        {experiences.map((exp, i) => {
+          const techs = parseTechs(exp.acf.technologies);
+          const isCurrent = exp.acf.end_date.toLowerCase() === 'presente';
+          const startStr = formatDate(exp.acf.start_date);
+          const endStr = isCurrent ? 'Presente' : formatDate(exp.acf.end_date);
+
+          return (
+            <div class="relative pl-14 sm:pl-20 reveal" style={`animation-delay: ${i * 100}ms`}>
+
+              <!-- Punto en la línea -->
+              <div class="absolute left-0 sm:left-2 top-1.5 flex items-center justify-center">
+                <div class={`w-5 h-5 rounded-full border-2 flex items-center justify-center
+                  ${isCurrent
+                    ? 'border-accent bg-accent'
+                    : 'border-border bg-parchment'
+                  }`}
+                >
+                  {isCurrent && (
+                    <div class="w-2 h-2 rounded-full bg-parchment"></div>
+                  )}
+                </div>
+              </div>
+
+              <!-- Tarjeta de experiencia -->
+              <div class="bg-white border border-border rounded-2xl p-6 hover:border-accent/30 hover:shadow-md transition-all duration-300">
+                <!-- Cabecera -->
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+                  <div>
+                    <h3 class="font-display text-lg font-semibold text-ink">
+                      {exp.acf.position || exp.title.rendered}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1">
+                      {exp.acf.company_url && exp.acf.company_url !== '#' && exp.acf.company_url !== '' ? (
+                        <a
+                          href={exp.acf.company_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-sm font-medium text-accent hover:underline"
+                        >
+                          {exp.acf.company}
+                        </a>
+                      ) : (
+                        <span class="text-sm font-medium text-accent">{exp.acf.company}</span>
+                      )}
                     </div>
-                    <div class="text-brand-500 font-medium mb-2">Empresa Tech Solutions</div>
-                    <p class="text-slate-400 leading-relaxed">
-                        Lideré el desarrollo de plataformas web utilizando WordPress como Headless CMS. Optimicé el rendimiento de carga en un 40% y coordiné un equipo de 3 desarrolladores junior.
-                    </p>
+                  </div>
+
+                  <!-- Fechas -->
+                  <div class="flex-shrink-0 text-right">
+                    <span class={`inline-flex items-center font-mono text-2xs px-3 py-1 rounded-full uppercase tracking-wider ${
+                      isCurrent
+                        ? 'bg-accent/10 text-accent'
+                        : 'bg-border/60 text-muted'
+                    }`}>
+                      {isCurrent && <span class="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>}
+                      {startStr} — {endStr}
+                    </span>
+                  </div>
                 </div>
 
-                <!-- Item 2 -->
-                <div class="relative pl-8 md:pl-12 group">
-                    <span class="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-slate-600 ring-4 ring-brand-950 group-hover:bg-brand-500 group-hover:ring-brand-500/30 transition-all"></span>
-                    
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                        <h3 class="text-xl font-bold text-white group-hover:text-brand-400 transition-colors">Frontend Developer</h3>
-                        <span class="text-sm text-slate-500 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-800 mt-1 sm:mt-0 w-fit">2020 - 2022</span>
-                    </div>
-                    <div class="text-brand-500 font-medium mb-2">Agencia Digital Creativa</div>
-                    <p class="text-slate-400 leading-relaxed">
-                        Desarrollo de interfaces de usuario pixel-perfect. Implementación de diseños complejos utilizando Tailwind CSS y React. Integración de APIs REST personalizadas.
-                    </p>
-                </div>
+                <!-- Descripción -->
+                <p class="text-sm text-muted leading-relaxed mb-4">
+                  {exp.acf.description}
+                </p>
 
-                <!-- WP ACF: End Experience Loop -->
-
+                <!-- Stack -->
+                {techs.length > 0 && (
+                  <div class="flex flex-wrap gap-2 pt-4 border-t border-border">
+                    {techs.map((tech) => (
+                      <span class="font-mono text-2xs text-muted bg-border/40 px-2.5 py-1 rounded-full">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-        </div>
-    </section>
+          );
+        })}
+      </div>
+    </div>
+
+  </div>
+</section>

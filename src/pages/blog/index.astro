@@ -1,235 +1,192 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+// src/pages/blog/index.astro
+import Layout from '@/layouts/Layout.astro';
+import Navbar from '@/components/ui/NavBar.astro';
+import Footer from '@/components/ui/Footer.astro';
+import { getPosts, getCategories, getFeaturedImage, stripHtml } from '@/lib/wordpress';
+import type { WPPost } from '@/lib/wordpress';
+
+// Paginación básica — puedes evolucionar esto con query params
+const PER_PAGE = 9;
+const page = Number(Astro.url.searchParams.get('page') ?? '1');
+
+let posts: WPPost[] = [];
+let categories = [];
+
+try {
+  [posts, categories] = await Promise.all([
+    getPosts(PER_PAGE, page),
+    getCategories(),
+  ]);
+} catch {
+  // Fallback vacío; muestra mensaje de carga pendiente
+}
+
+function formatPostDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+// Post principal (featured) = primer post
+const featured = posts[0];
+const rest = posts.slice(1);
 ---
-<Layout title="Blog | Luis Angel Gutierrez"> 
-<!-- Main Content -->
-    <main class="grow pt-32 pb-20 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <!-- Header del Blog + Buscador -->
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 animate-fade-in-up">
-                <div>
-                    <h1 class="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
-                        Blog & <span class="text-gradient">Recursos</span>
-                    </h1>
-                    <p class="text-slate-400 max-w-xl text-lg">
-                        Comparto mis aprendizajes sobre desarrollo web, tutoriales de Astro + WP, y reflexiones sobre la industria tech.
-                    </p>
+
+<Layout
+  title="Blog · Luis Angel Gutierrez"
+  description="Artículos sobre desarrollo Full Stack, arquitectura web, JavaScript, React, Node.js y más."
+>
+  <Navbar slot="nav" />
+
+  <!-- Hero del blog -->
+  <section class="pt-16 pb-12 border-b border-border">
+    <div class="max-w-content mx-auto px-6 lg:px-10 py-16">
+      <div class="flex items-center gap-4 mb-6">
+        <span class="block w-8 h-px bg-accent"></span>
+        <span class="font-mono text-xs text-accent uppercase tracking-widest">Blog</span>
+      </div>
+      <h1 class="font-display text-5xl lg:text-6xl font-bold text-ink leading-tight">
+        Notas sobre<br /><em class="text-accent font-normal italic">desarrollo</em>
+      </h1>
+      <p class="mt-5 max-w-lg text-muted text-lg font-light">
+        Artículos sobre lo que aprendo, experimento y construyo como desarrollador Full Stack.
+      </p>
+    </div>
+  </section>
+
+  <div class="max-w-content mx-auto px-6 lg:px-10 py-16">
+
+    {/* Post destacado */}
+    {featured && (
+      <div class="mb-16">
+        <a
+          href={`/blog/${featured.slug}`}
+          class="group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-parchment border border-border rounded-2xl overflow-hidden hover:border-accent/40 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+        >
+          <!-- Imagen -->
+          <div class="relative aspect-video lg:aspect-auto bg-accent-light overflow-hidden">
+            {getFeaturedImage(featured) ? (
+              <img
+                src={getFeaturedImage(featured)}
+                alt={featured.title.rendered}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="font-display text-7xl font-bold text-accent/20">
+                  {featured.title.rendered.charAt(0)}
+                </span>
+              </div>
+            )}
+            <span class="absolute top-4 left-4 font-mono text-2xs uppercase tracking-wider bg-accent text-parchment px-3 py-1 rounded-full">
+              Destacado
+            </span>
+          </div>
+          <!-- Contenido -->
+          <div class="p-8 lg:p-10 flex flex-col justify-center">
+            <p class="font-mono text-2xs text-muted uppercase tracking-wider mb-4">
+              {formatPostDate(featured.date)}
+            </p>
+            <h2 class="font-display text-2xl lg:text-3xl font-semibold text-ink leading-snug mb-4 group-hover:text-accent transition-colors">
+              {featured.title.rendered}
+            </h2>
+            <p class="text-muted leading-relaxed line-clamp-3 mb-6">
+              {stripHtml(featured.excerpt.rendered)}
+            </p>
+            <span class="inline-flex items-center gap-2 text-sm font-medium text-accent">
+              Leer artículo
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </span>
+          </div>
+        </a>
+      </div>
+    )}
+
+    {/* Resto de posts */}
+    {rest.length > 0 && (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {rest.map((post) => {
+          const img = getFeaturedImage(post);
+          const excerpt = stripHtml(post.excerpt.rendered);
+          return (
+            <a
+              href={`/blog/${post.slug}`}
+              class="group flex flex-col bg-parchment border border-border rounded-2xl overflow-hidden hover:border-accent/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 reveal"
+            >
+              <div class="relative aspect-video bg-accent-light overflow-hidden">
+                {img ? (
+                  <img
+                    src={img}
+                    alt={post.title.rendered}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="font-display text-4xl font-bold text-accent/20">
+                      {post.title.rendered.charAt(0)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div class="flex flex-col flex-1 p-5">
+                <p class="font-mono text-2xs text-muted uppercase tracking-wider mb-3">
+                  {formatPostDate(post.date)}
+                </p>
+                <h3 class="font-display text-lg font-semibold text-ink leading-snug mb-3 group-hover:text-accent transition-colors line-clamp-2">
+                  {post.title.rendered}
+                </h3>
+                <p class="text-sm text-muted leading-relaxed flex-1 line-clamp-3">
+                  {excerpt}
+                </p>
+                <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                  <span class="text-xs font-medium text-accent">Leer más</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
                 </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
 
-                <!-- Search Bar (Simulada) -->
-                <form class="w-full md:w-auto relative group">
-                    <input type="text" placeholder="Buscar artículo..." 
-                           class="w-full md:w-80 bg-dark-card border border-white/10 rounded-full px-6 py-3 pl-12 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder-slate-500">
-                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500 group-focus-within:text-brand-500 transition-colors"></i>
-                </form>
-            </div>
+    {/* Sin posts */}
+    {posts.length === 0 && (
+      <div class="text-center py-20">
+        <p class="font-display text-2xl text-muted">Próximamente...</p>
+        <p class="text-sm text-muted mt-2">Los artículos se cargarán desde WordPress.</p>
+      </div>
+    )}
 
-            <!-- Categories Filter -->
-            <div class="flex flex-wrap gap-2 mb-16 animate-fade-in-up" style="animation-delay: 0.1s;">
-                <button class="px-4 py-2 rounded-full bg-brand-600 text-white font-medium text-sm transition-all hover:bg-brand-700">Todos</button>
-                <button class="px-4 py-2 rounded-full bg-dark-card border border-white/5 text-slate-400 hover:text-white hover:border-brand-500/30 text-sm transition-all">Tutoriales</button>
-                <button class="px-4 py-2 rounded-full bg-dark-card border border-white/5 text-slate-400 hover:text-white hover:border-brand-500/30 text-sm transition-all">Astro</button>
-                <button class="px-4 py-2 rounded-full bg-dark-card border border-white/5 text-slate-400 hover:text-white hover:border-brand-500/30 text-sm transition-all">WordPress</button>
-                <button class="px-4 py-2 rounded-full bg-dark-card border border-white/5 text-slate-400 hover:text-white hover:border-brand-500/30 text-sm transition-all">Carrera</button>
-            </div>
+    <!-- Paginación -->
+    {posts.length === PER_PAGE && (
+      <div class="mt-16 flex items-center justify-center gap-4">
+        {page > 1 && (
+          <a
+            href={`/blog?page=${page - 1}`}
+            class="px-5 py-2 border border-border text-sm text-muted hover:border-ink hover:text-ink rounded-full transition-colors"
+          >
+            ← Anterior
+          </a>
+        )}
+        <span class="font-mono text-sm text-muted">Página {page}</span>
+        <a
+          href={`/blog?page=${page + 1}`}
+          class="px-5 py-2 border border-border text-sm text-muted hover:border-ink hover:text-ink rounded-full transition-colors"
+        >
+          Siguiente →
+        </a>
+      </div>
+    )}
 
-            <!-- Featured Post (Sticky Post in WP) -->
-            <section class="mb-16 animate-fade-in-up" style="animation-delay: 0.2s;">
-                <a href="#" class="group relative block rounded-3xl overflow-hidden border border-white/5 hover:border-brand-500/50 transition-all duration-300">
-                    <div class="grid grid-cols-1 md:grid-cols-2 h-full">
-                        <!-- Imagen Destacada -->
-                        <div class="relative h-64 md:h-auto overflow-hidden">
-                            <div class="absolute inset-0 bg-slate-800 flex items-center justify-center">
-                                <i class="ph ph-rocket-launch text-6xl text-slate-600"></i>
-                            </div>
-                            <!-- Overlay gradiente -->
-                            <div class="absolute inset-0 bg-linear-to-t md:bg-linear-to-r from-dark-card/90 via-dark-card/50 to-transparent"></div>
-                        </div>
-                        
-                        <!-- Contenido -->
-                        <div class="bg-dark-card p-8 md:p-12 flex flex-col justify-center">
-                            <div class="flex items-center gap-3 mb-4 text-xs font-mono uppercase tracking-wider">
-                                <span class="text-brand-400 font-bold">Destacado</span>
-                                <span class="w-1 h-1 bg-slate-500 rounded-full"></span>
-                                <span class="text-slate-500">Hace 2 días</span>
-                            </div>
-                            
-                            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-brand-400 transition-colors">
-                                La guía definitiva para usar WordPress como Headless CMS
-                            </h2>
-                            
-                            <p class="text-slate-400 mb-6 line-clamp-3">
-                                Descubre cómo desacoplar el frontend del backend para ganar velocidad, seguridad y flexibilidad. Analizamos la API REST, GraphQL y cómo consumirlo desde Astro.
-                            </p>
-                            
-                            <div class="flex items-center gap-2 text-brand-500 font-semibold group-hover:gap-4 transition-all">
-                                Leer artículo completo <i class="ph-bold ph-arrow-right"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </section>
+  </div>
 
-            <!-- Grid de Posts Normales -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 animate-fade-in-up" style="animation-delay: 0.3s;">
-                
-                <!-- WP Loop Start -->
-                
-                <!-- Article Card 1 -->
-                <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                        <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <!-- Placeholder Image -->
-                            <i class="ph ph-file-code text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">Frontend</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">20 Oct, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            Mejorando el rendimiento de fuentes web
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Técnicas modernas para cargar tipografías sin bloquear el renderizado ni causar saltos de diseño (CLS).
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-
-                <!-- Article Card 2 -->
-                <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                         <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <i class="ph ph-brackets-curly text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">Astro</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">15 Oct, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            View Transitions API en Astro 4.0
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Cómo crear animaciones de navegación fluidas tipo SPA en tu sitio estático con pocas líneas de código.
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-
-                <!-- Article Card 3 -->
-                <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                         <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <i class="ph ph-database text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">Backend</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">08 Oct, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            Estructurando datos con ACF y Custom Post Types
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Aprende a modelar contenido complejo en WordPress para consumirlo fácilmente desde cualquier frontend.
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-
-                <!-- Article Card 4 -->
-                <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                         <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <i class="ph ph-briefcase text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">Carrera</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">01 Oct, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            Soft Skills esenciales para Desarrolladores Senior
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Más allá del código: comunicación, mentoría y gestión del tiempo en equipos remotos.
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-
-                <!-- Article Card 5 -->
-                <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                         <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <i class="ph ph-git-branch text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">DevOps</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">25 Sep, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            Automatizando despliegues con GitHub Actions
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Configura un pipeline de CI/CD para desplegar tu sitio Astro automáticamente al hacer push.
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-
-                 <!-- Article Card 6 -->
-                 <article class="bg-dark-card rounded-2xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all group flex flex-col h-full hover:-translate-y-1">
-                    <div class="h-52 bg-slate-800 relative overflow-hidden">
-                         <div class="absolute inset-0 flex items-center justify-center bg-slate-800 group-hover:scale-105 transition-transform duration-500">
-                            <i class="ph ph-paint-brush-broad text-5xl text-slate-700"></i>
-                        </div>
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-black/60 backdrop-blur border border-white/10 text-white text-xs px-3 py-1 rounded-full">Diseño</span>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col">
-                        <div class="text-slate-500 text-xs mb-3 font-mono">20 Sep, 2023</div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors line-clamp-2">
-                            Tailwind CSS vs CSS Modules
-                        </h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
-                            Una comparativa honesta sobre mantenibilidad y velocidad de desarrollo en 2024.
-                        </p>
-                        <a href="#" class="text-brand-500 text-sm font-semibold hover:underline">Leer más</a>
-                    </div>
-                </article>
-                
-                <!-- WP Loop End -->
-
-            </div>
-
-            <!-- Pagination (Estilo WP clásico) -->
-            <div class="flex justify-center items-center gap-2">
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 bg-dark-card text-slate-400 hover:text-white hover:border-brand-500 hover:bg-brand-600/10 transition-all disabled">
-                    <i class="ph ph-caret-left"></i>
-                </a>
-                
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-brand-500 bg-brand-600 text-white font-bold shadow-lg shadow-brand-900/50">1</a>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 bg-dark-card text-slate-400 hover:text-white hover:border-brand-500 hover:bg-brand-600/10 transition-all">2</a>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 bg-dark-card text-slate-400 hover:text-white hover:border-brand-500 hover:bg-brand-600/10 transition-all">3</a>
-                <span class="text-slate-600 px-2">...</span>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 bg-dark-card text-slate-400 hover:text-white hover:border-brand-500 hover:bg-brand-600/10 transition-all">8</a>
-
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 bg-dark-card text-slate-400 hover:text-white hover:border-brand-500 hover:bg-brand-600/10 transition-all">
-                    <i class="ph ph-caret-right"></i>
-                </a>
-            </div>
-
-        </div>
-    </main>
-    </Layout
+  <Footer slot="footer" />
+</Layout>

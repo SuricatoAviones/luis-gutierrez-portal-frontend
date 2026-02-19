@@ -1,0 +1,26 @@
+---
+// src/pages/404.astro
+import Layout from '@/layouts/Layout.astro';
+import NavBar from '@/components/ui/NavBar.astro';
+import Footer from '@/components/ui/Footer.astro';
+---
+
+<Layout title="404 · Página no encontrada" description="La página que buscas no existe.">
+  <NavBar slot="nav" />
+
+  <section class="min-h-[70vh] flex items-center justify-center">
+    <div class="text-center px-6">
+      <p class="font-mono text-xs text-accent uppercase tracking-widest mb-4">Error 404</p>
+      <h1 class="font-display text-8xl font-bold text-ink mb-6">¯\_(ツ)_/¯</h1>
+      <p class="text-xl text-muted font-light mb-10">Esta página no existe o fue movida.</p>
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-ink text-parchment text-sm font-medium rounded-full hover:bg-accent transition-colors duration-300"
+      >
+        Volver al inicio
+      </a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>

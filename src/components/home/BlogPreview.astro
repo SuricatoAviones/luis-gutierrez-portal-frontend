@@ -1,83 +1,134 @@
-<!-- Blog Preview Section -->
-    <section id="blog" class="relative z-10 py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-12 text-center">
-                Últimos <span class="text-brand-500">Artículos</span>
-            </h2>
+---
+// src/components/sections/BlogPreview.astro
+import { getLatestPosts, getFeaturedImage, stripHtml } from '../../lib/wordpress';
+import type { WPPost } from '../../lib/wordpress';
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- WP Loop: Blog Posts (Limit 3) -->
-                
-                <!-- Post 1 -->
-                <a href="#" class="group block">
-                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
-                        <div class="h-48 bg-slate-800 relative overflow-hidden">
-                            <!-- Featured Image -->
-                            <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
-                                <span class="text-brand-400">Tutorial</span> • 12 Oct, 2023
-                            </div>
-                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
-                                Cómo conectar Astro con WordPress vía REST API
-                            </h3>
-                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
-                                Guía paso a paso para configurar endpoints en WordPress y consumirlos eficientemente en Astro 4.0.
-                            </p>
-                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
-                            </span>
-                        </div>
-                    </article>
-                </a>
+const fallbackPosts: WPPost[] = [
+  {
+    id: 1,
+    slug: 'primer-post',
+    date: '2024-03-01T00:00:00',
+    title: { rendered: 'Construyendo un Headless CMS con WordPress y Astro' },
+    excerpt: { rendered: '<p>Aprende cómo separar el frontend de WordPress para obtener rendimiento, flexibilidad y la mejor experiencia de desarrollo posible.</p>' },
+    content: { rendered: '' },
+  },
+  {
+    id: 2,
+    slug: 'segundo-post',
+    date: '2024-02-15T00:00:00',
+    title: { rendered: 'TypeScript para desarrolladores JavaScript: la guía definitiva' },
+    excerpt: { rendered: '<p>Todo lo que necesitas saber para migrar tu proyecto a TypeScript sin morir en el intento, con ejemplos prácticos y patrones reales.</p>' },
+    content: { rendered: '' },
+  },
+  {
+    id: 3,
+    slug: 'tercer-post',
+    date: '2024-01-20T00:00:00',
+    title: { rendered: 'Arquitectura limpia en Node.js: más allá del MVC' },
+    excerpt: { rendered: '<p>Exploramos cómo estructurar aplicaciones Node.js escalables utilizando principios de Clean Architecture y Domain-Driven Design.</p>' },
+    content: { rendered: '' },
+  },
+];
 
-                <!-- Post 2 -->
-                <a href="#" class="group block">
-                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
-                        <div class="h-48 bg-slate-800 relative overflow-hidden">
-                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
-                                <span class="text-brand-400">ACF</span> • 28 Sep, 2023
-                            </div>
-                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
-                                Campos flexibles vs Repetidores en ACF
-                            </h3>
-                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
-                                Analizamos cuándo utilizar Flexible Content o Repeater Fields para estructurar tu contenido de manera óptima.
-                            </p>
-                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
-                            </span>
-                        </div>
-                    </article>
-                </a>
-                
-                <!-- Post 3 (Hidden on mobile, shown on lg) -->
-                <a href="#" class="group hidden lg:block">
-                    <article class="bg-dark-card rounded-xl overflow-hidden border border-white/5 hover:border-brand-500/40 transition-all h-full flex flex-col">
-                        <div class="h-48 bg-slate-800 relative overflow-hidden">
-                             <div class="absolute inset-0 bg-slate-800 group-hover:scale-105 transition-transform duration-500"></div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="flex items-center gap-3 mb-3 text-xs text-slate-500 font-mono uppercase tracking-wider">
-                                <span class="text-brand-400">CSS</span> • 15 Sep, 2023
-                            </div>
-                            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">
-                                Dominando Grid Layout con Tailwind
-                            </h3>
-                            <p class="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
-                                Trucos y mejores prácticas para crear layouts complejos responsive sin escribir CSS personalizado.
-                            </p>
-                            <span class="text-brand-500 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                                Leer artículo <i class="ph-bold ph-arrow-right"></i>
-                            </span>
-                        </div>
-                    </article>
-                </a>
+let posts = fallbackPosts;
 
+try {
+  const fetched = await getLatestPosts(3);
+  if (fetched.length > 0) posts = fetched;
+} catch {
+  // Usa fallback
+}
+
+function formatPostDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+---
+
+<section id="blog" class="py-24 lg:py-32">
+  <div class="max-w-content mx-auto px-6 lg:px-10">
+
+    <!-- Encabezado de sección -->
+    <div class="flex items-center justify-between mb-16 reveal">
+      <div class="flex items-center gap-4">
+        <span class="font-mono text-2xs text-accent uppercase tracking-widest">05</span>
+        <span class="block w-8 h-px bg-accent"></span>
+        <h2 class="font-display text-3xl lg:text-4xl font-semibold text-ink">Blog</h2>
+      </div>
+      <a
+        href="/blog"
+        class="hidden sm:inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors"
+      >
+        Ver todos
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Posts grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {posts.map((post, i) => {
+        const img = getFeaturedImage(post);
+        const excerpt = stripHtml(post.excerpt.rendered);
+        const delay = i * 100;
+
+        return (
+          <a
+            href={`/blog/${post.slug}`}
+            class="reveal group flex flex-col bg-parchment border border-border rounded-2xl overflow-hidden hover:border-accent/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            style={`animation-delay: ${delay}ms`}
+          >
+            <!-- Imagen -->
+            <div class="relative aspect-video bg-accent-light overflow-hidden">
+              {img ? (
+                <img
+                  src={img}
+                  alt={post.title.rendered}
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-accent/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                  </svg>
+                </div>
+              )}
             </div>
-        </div>
-    </section>
+
+            <!-- Contenido -->
+            <div class="flex flex-col flex-1 p-5">
+              <p class="font-mono text-2xs text-muted uppercase tracking-wider mb-3">
+                {formatPostDate(post.date)}
+              </p>
+              <h3 class="font-display text-lg font-semibold text-ink leading-snug mb-3 group-hover:text-accent transition-colors line-clamp-2">
+                {post.title.rendered}
+              </h3>
+              <p class="text-sm text-muted leading-relaxed flex-1 line-clamp-3">
+                {excerpt}
+              </p>
+              <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                <span class="text-xs font-medium text-accent">Leer artículo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Ver todos mobile -->
+    <div class="mt-10 text-center sm:hidden reveal">
+      <a href="/blog" class="inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors">
+        Ver todos los artículos →
+      </a>
+    </div>
+
+  </div>
+</section>

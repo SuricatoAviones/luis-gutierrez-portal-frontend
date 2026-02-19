@@ -1,0 +1,132 @@
+---
+// src/components/Navbar.astro
+const navLinks = [
+  { href: '/#sobre-mi',    label: 'Sobre mí' },
+  { href: '/#habilidades', label: 'Habilidades' },
+  { href: '/#portafolio',  label: 'Portafolio' },
+  { href: '/#experiencia', label: 'Experiencia' },
+  { href: '/blog',         label: 'Blog' },
+  { href: '/contacto',     label: 'Contacto' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+>
+  <nav class="max-w-content mx-auto px-6 lg:px-10 flex items-center justify-between h-16">
+    <!-- Logo / Nombre -->
+    <a
+      href="/"
+      class="font-display text-lg font-semibold tracking-tight text-ink hover:text-accent transition-colors duration-200"
+    >
+      LAG<span class="text-accent">.</span>
+    </a>
+
+    <!-- Links desktop -->
+    <ul class="hidden md:flex items-center gap-8">
+      {navLinks.map(({ href, label }) => (
+        <li>
+          <a
+            href={href}
+            class={`font-sans text-sm font-medium transition-colors duration-200 
+              ${currentPath === href || (href !== '/' && currentPath.startsWith(href.split('#')[0]))
+                ? 'text-accent'
+                : 'text-muted hover:text-ink'
+              }`}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- CTA desktop -->
+    <a
+      href="/contacto"
+      class="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-ink text-parchment text-sm font-medium rounded-full hover:bg-accent transition-colors duration-300"
+    >
+      Hablemos
+    </a>
+
+    <!-- Hamburger mobile -->
+    <button
+      id="menu-toggle"
+      aria-label="Abrir menú"
+      class="md:hidden flex flex-col gap-1.5 p-2"
+    >
+      <span class="menu-line block w-5 h-px bg-ink transition-all duration-300 origin-center"></span>
+      <span class="menu-line block w-5 h-px bg-ink transition-all duration-300 origin-center"></span>
+      <span class="menu-line block w-5 h-px bg-ink transition-all duration-300 origin-center"></span>
+    </button>
+  </nav>
+
+  <!-- Menú mobile -->
+  <div
+    id="mobile-menu"
+    class="md:hidden hidden flex-col bg-parchment border-t border-border px-6 pb-6 pt-4 gap-4"
+  >
+    {navLinks.map(({ href, label }) => (
+      <a
+        href={href}
+        class="font-sans text-base font-medium text-muted hover:text-ink transition-colors py-1"
+      >
+        {label}
+      </a>
+    ))}
+    <a
+      href="/contacto"
+      class="mt-2 inline-flex items-center justify-center px-4 py-2.5 bg-ink text-parchment text-sm font-medium rounded-full"
+    >
+      Hablemos
+    </a>
+  </div>
+</header>
+
+<!-- Offset para que el contenido no quede detrás del navbar fijo -->
+<div class="h-16"></div>
+
+<script>
+  // Scroll: navbar con fondo al bajar
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      navbar?.classList.add('bg-parchment/90', 'backdrop-blur-sm', 'border-b', 'border-border', 'shadow-sm');
+    } else {
+      navbar?.classList.remove('bg-parchment/90', 'backdrop-blur-sm', 'border-b', 'border-border', 'shadow-sm');
+    }
+  });
+
+  // Hamburger toggle
+  const btn = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const lines = document.querySelectorAll('.menu-line');
+  let open = false;
+
+  btn?.addEventListener('click', () => {
+    open = !open;
+    menu?.classList.toggle('hidden', !open);
+    menu?.classList.toggle('flex', open);
+    // Animación X
+    if (open) {
+      lines[0]?.classList.add('rotate-45', 'translate-y-[0.375rem]');
+      lines[1]?.classList.add('opacity-0');
+      lines[2]?.classList.add('-rotate-45', '-translate-y-[0.375rem]');
+    } else {
+      lines[0]?.classList.remove('rotate-45', 'translate-y-[0.375rem]');
+      lines[1]?.classList.remove('opacity-0');
+      lines[2]?.classList.remove('-rotate-45', '-translate-y-[0.375rem]');
+    }
+  });
+
+  // Cerrar menu al hacer click en un link
+  menu?.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => {
+      open = false;
+      menu.classList.add('hidden');
+      menu.classList.remove('flex');
+    });
+  });
+</script>

@@ -1,0 +1,37 @@
+---
+// src/pages/contacto.astro
+import Layout from '@/layouts/Layout.astro';
+import Navbar from '@/components/ui/NavBar.astro';
+import Footer from '@/components/ui/Footer.astro';
+import Contact from '@/components/home/Contact.astro';
+---
+
+<Layout
+  title="Contacto · Luis Angel Gutierrez"
+  description="¿Tienes un proyecto en mente? Escríbeme y te respondo en menos de 24 horas."
+>
+  <Navbar slot="nav" />
+
+  <!-- Encabezado de la página -->
+  <section class="py-20 border-b border-border">
+    <div class="max-w-content mx-auto px-6 lg:px-10">
+      <div class="flex items-center gap-4 mb-6">
+        <span class="block w-8 h-px bg-accent"></span>
+        <span class="font-mono text-xs text-accent uppercase tracking-widest">Hablemos</span>
+      </div>
+      <h1 class="font-display text-5xl lg:text-6xl font-bold text-ink leading-tight">
+        ¿Tienes un proyecto<br />
+        <em class="text-accent font-normal italic">en mente?</em>
+      </h1>
+      <p class="mt-6 max-w-lg text-muted text-lg font-light">
+        Estoy disponible para proyectos freelance, colaboraciones y oportunidades remotas.
+        No dudes en escribirme.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sección de contacto (reutiliza el componente) -->
+  <Contact />
+
+  <Footer slot="footer" />
+</Layout>

@@ -1,91 +1,148 @@
-<!-- Skills Section -->
-    <section id="skills" class="relative z-10 py-24 bg-brand-950/50 border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-12 text-center">
-                Tech <span class="text-brand-500">Stack</span>
-            </h2>
+---
+// src/components/sections/Skills.astro
+import { getSkills, groupSkillsByCategory } from '../../lib/wordpress';
+import type { Skill } from '../../lib/wordpress';
 
-            <!-- Grid de Categorias -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                
-                <!-- Category 1: Frontend -->
-                <div class="bg-dark-card p-8 rounded-2xl border border-white/5 hover:border-brand-500/30 transition-all group">
-                    <div class="w-12 h-12 bg-brand-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-brand-500/20 transition-colors">
-                        <i class="ph ph-desktop text-2xl text-brand-400"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-6">Frontend</h3>
-                    <ul class="space-y-3">
-                        <!-- ACF Repeater: Skill Items -->
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-brand-500"></i> HTML5 / CSS3
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-brand-500"></i> Tailwind CSS
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-brand-500"></i> JavaScript (ES6+)
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-brand-500"></i> Astro Framework
-                        </li>
-                         <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-brand-500"></i> React.js
-                        </li>
-                    </ul>
-                </div>
+// Datos de fallback en caso de que la API no esté lista
+const fallbackSkills: Record<string, Skill[]> = {
+  Frontend: [
+    { id: 1, title: { rendered: 'React' },      acf: { level: 90, category: 'Frontend', icon: '' } },
+    { id: 2, title: { rendered: 'Next.js' },    acf: { level: 85, category: 'Frontend', icon: '' } },
+    { id: 3, title: { rendered: 'TypeScript' }, acf: { level: 80, category: 'Frontend', icon: '' } },
+    { id: 4, title: { rendered: 'Tailwind CSS'},acf: { level: 95, category: 'Frontend', icon: '' } },
+    { id: 5, title: { rendered: 'Astro' },      acf: { level: 75, category: 'Frontend', icon: '' } },
+  ],
+  Backend: [
+    { id: 6, title: { rendered: 'Node.js' },    acf: { level: 85, category: 'Backend', icon: '' } },
+    { id: 7, title: { rendered: 'Express' },    acf: { level: 80, category: 'Backend', icon: '' } },
+    { id: 8, title: { rendered: 'WordPress' },  acf: { level: 90, category: 'Backend', icon: '' } },
+    { id: 9, title: { rendered: 'REST APIs' },  acf: { level: 88, category: 'Backend', icon: '' } },
+  ],
+  'Base de Datos': [
+    { id: 10, title: { rendered: 'MySQL' },     acf: { level: 80, category: 'Base de Datos', icon: '' } },
+    { id: 11, title: { rendered: 'PostgreSQL' },acf: { level: 75, category: 'Base de Datos', icon: '' } },
+    { id: 12, title: { rendered: 'MongoDB' },   acf: { level: 70, category: 'Base de Datos', icon: '' } },
+  ],
+  DevOps: [
+    { id: 13, title: { rendered: 'Git / GitHub' },acf: { level: 90, category: 'DevOps', icon: '' } },
+    { id: 14, title: { rendered: 'Docker' },      acf: { level: 70, category: 'DevOps', icon: '' } },
+    { id: 15, title: { rendered: 'Vercel' },      acf: { level: 85, category: 'DevOps', icon: '' } },
+  ],
+};
 
-                <!-- Category 2: Backend & CMS -->
-                <div class="bg-dark-card p-8 rounded-2xl border border-white/5 hover:border-brand-500/30 transition-all group relative overflow-hidden">
-                    <!-- Highlight effect -->
-                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-brand-500/10 rounded-full blur-2xl"></div>
-                    
-                    <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition-colors">
-                        <i class="ph ph-database text-2xl text-purple-400"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-6">Backend & CMS</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-purple-500"></i> WordPress Headless
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-purple-500"></i> PHP
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-purple-500"></i> Advanced Custom Fields (ACF)
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-purple-500"></i> Node.js (Básico)
-                        </li>
-                         <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-purple-500"></i> MySQL
-                        </li>
-                    </ul>
-                </div>
+let skillsByCategory = fallbackSkills;
 
-                <!-- Category 3: Tools -->
-                <div class="bg-dark-card p-8 rounded-2xl border border-white/5 hover:border-brand-500/30 transition-all group">
-                    <div class="w-12 h-12 bg-teal-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-teal-500/20 transition-colors">
-                        <i class="ph ph-wrench text-2xl text-teal-400"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-6">Herramientas</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-teal-500"></i> Git & GitHub
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-teal-500"></i> VS Code
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-teal-500"></i> Figma
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-teal-500"></i> Postman
-                        </li>
-                        <li class="flex items-center gap-3 text-slate-400">
-                            <i class="ph-fill ph-check-circle text-teal-500"></i> Vercel / Netlify
-                        </li>
-                    </ul>
-                </div>
+try {
+  const rawSkills = await getSkills();
+  if (rawSkills.length > 0) {
+    skillsByCategory = groupSkillsByCategory(rawSkills);
+  }
+} catch {
+  // Usa fallback si la API no responde
+}
+
+const categories = Object.keys(skillsByCategory);
+---
+
+<section id="habilidades" class="py-24 lg:py-32 bg-ink text-parchment">
+  <div class="max-w-content mx-auto px-6 lg:px-10">
+
+    <!-- Encabezado de sección -->
+    <div class="flex items-center gap-4 mb-16 reveal">
+      <span class="font-mono text-2xs text-accent uppercase tracking-widest">02</span>
+      <span class="block w-8 h-px bg-accent"></span>
+      <h2 class="font-display text-3xl lg:text-4xl font-semibold text-parchment">Habilidades</h2>
+    </div>
+
+    <!-- Tabs de categorías -->
+    <div class="flex flex-wrap gap-2 mb-12 reveal" id="skill-tabs">
+      {categories.map((cat, i) => (
+        <button
+          data-category={cat}
+          class={`skill-tab px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+            i === 0
+              ? 'bg-accent border-accent text-parchment'
+              : 'border-parchment/20 text-parchment/50 hover:border-parchment/60 hover:text-parchment'
+          }`}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+
+    <!-- Grillas de skills por categoría -->
+    {categories.map((cat, i) => (
+      <div
+        data-panel={cat}
+        class={`skill-panel ${i !== 0 ? 'hidden' : ''} grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`}
+      >
+        {skillsByCategory[cat].map((skill, j) => (
+          <div
+            class="reveal group bg-parchment/5 hover:bg-parchment/10 border border-parchment/10 rounded-xl p-5 transition-all duration-300"
+            style={`animation-delay: ${j * 60}ms`}
+          >
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-sans text-sm font-medium text-parchment">
+                {skill.title.rendered}
+              </span>
+              <span class="font-mono text-xs text-accent">{skill.acf.level}%</span>
             </div>
-        </div>
-    </section>
+            <!-- Barra de nivel -->
+            <div class="h-1 bg-parchment/10 rounded-full overflow-hidden">
+              <div
+                class="skill-bar h-full bg-accent rounded-full origin-left scale-x-0 transition-transform duration-700 ease-expo"
+                style={`--level: ${skill.acf.level / 100}`}
+              ></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ))}
+
+  </div>
+</section>
+
+<script>
+  // Tabs: mostrar/ocultar categorías
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.skill-tab');
+  const panels = document.querySelectorAll<HTMLDivElement>('.skill-panel');
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const cat = tab.dataset.category;
+
+      tabs.forEach((t) => {
+        t.classList.remove('bg-accent', 'border-accent', 'text-parchment');
+        t.classList.add('border-parchment/20', 'text-parchment/50');
+      });
+      tab.classList.add('bg-accent', 'border-accent', 'text-parchment');
+      tab.classList.remove('border-parchment/20', 'text-parchment/50');
+
+      panels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.panel !== cat);
+      });
+
+      // Animar barras del panel activo
+      animateBars();
+    });
+  });
+
+  // Anima barras de nivel cuando son visibles
+  function animateBars() {
+    document.querySelectorAll<HTMLDivElement>('.skill-bar:not([data-animated])').forEach((bar) => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const level = bar.style.getPropertyValue('--level');
+            bar.style.transform = `scaleX(${level})`;
+            bar.dataset.animated = 'true';
+            observer.unobserve(bar);
+          }
+        });
+      });
+      observer.observe(bar);
+    });
+  }
+
+  animateBars();
+</script>

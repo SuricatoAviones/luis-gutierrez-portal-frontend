@@ -1,19 +1,27 @@
 ---
-import BlogPreview from '@/components/home/BlogPreview.astro';
-import Experience from '@/components/home/Experience.astro';
-import Hero from '@/components/home/Hero.astro';
-import Projects from '@/components/home/Projects.astro';
-import Skills from '@/components/home/Skills.astro';
-import Contact from '@/components/home/Contact.astro';
+// src/pages/index.astro
 import Layout from '@/layouts/Layout.astro';
-
+import NavBar from '@/components/ui/NavBar.astro';
+import Footer from '@/components/ui/Footer.astro';
+import Hero from '@/components/home/Hero.astro';
+import About from '@/components/home/About.astro';
+import Skills from '@/components/home/Skills.astro';
+import Portfolio from '@/components/home/Portfolio.astro';
+import Experience from '@/components/home/Experience.astro';
+import BlogPreview from '@/components/home/BlogPreview.astro';
+import Contact from '@/components/home/Contact.astro';
 ---
 
-<Layout title='Desarrollador Full Stack | Luis Angel Gutierrez'>
-	<Hero />
-	<Experience />
-	<Projects />
-	<Skills />
-	<BlogPreview />
-	<Contact />
+<Layout>
+  <NavBar slot="nav" />
+  
+  <Hero />
+  <About />
+  <Skills />
+  <Portfolio />
+  <Experience />
+  <BlogPreview />
+  <Contact />
+
+  <Footer slot="footer" />
 </Layout>
