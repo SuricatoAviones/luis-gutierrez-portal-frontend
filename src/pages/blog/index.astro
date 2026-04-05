@@ -12,7 +12,7 @@ const page = Number(Astro.url.searchParams.get("page") ?? "1");
 
 <Layout
   title="Blog · Luis Angel Gutierrez"
-  description="Artículos sobre desarrollo Full Stack, arquitectura web, JavaScript, React, Node.js y más."
+  description="Blog de Luis Angel Gutierrez con artículos sobre desarrollo full stack, arquitectura web, JavaScript, React, Node.js y buenas prácticas de software."
 >
   <Navbar slot="nav" />
 
@@ -105,7 +105,7 @@ const page = Number(Astro.url.searchParams.get("page") ?? "1");
   const getFeaturedImage = (post) =>
     post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
 
-  const postUrl = (slug) => `/blog/post?slug=${encodeURIComponent(slug)}`;
+  const postUrl = (slug) => `/blog/${encodeURIComponent(slug)}`;
 
   const createFeaturedCard = (post) => {
     const wrapper = document.createElement("a");

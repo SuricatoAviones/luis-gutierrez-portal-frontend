@@ -1,22 +1,30 @@
 ---
-// src/layouts/Layout.astro
 import "@/styles/global.css";
+import { buildMetaDescription } from "@/lib/seo";
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  robots?: string;
+  ogType?: "website" | "article";
 }
+
+const defaultDescription =
+  "Portafolio y blog técnico de Luis Gutierrez sobre desarrollo full stack, arquitectura web y creación de productos digitales.";
 
 const {
   title = "Luis Gutierrez — Ingeniero de Software",
-  description = "Portafolio y blog técnico de Luis Gutierrez. Ingeniería de software, arquitectura web y diseño de producto.",
+  description = defaultDescription,
   image = "/og-image.png",
+  robots = "index,follow",
+  ogType = "website",
 } = Astro.props;
 
 const canonicalURL = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url;
+const metaDescription = buildMetaDescription(description, defaultDescription);
 ---
 
 <!doctype html>
@@ -24,20 +32,21 @@ const canonicalURL = Astro.site
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="author" content="Luis Gutierrez" />
+    <meta name="robots" content={robots} />
 
     <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:image" content={image} />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={image} />
 
     <link rel="canonical" href={canonicalURL} />
@@ -58,7 +67,6 @@ const canonicalURL = Astro.site
         if (stored === "dark") document.documentElement.classList.add("dark");
         else if (stored === "light")
           document.documentElement.classList.add("light");
-        // If no stored preference, CSS handles prefers-color-scheme automatically
       })();
     </script>
 
@@ -68,18 +76,14 @@ const canonicalURL = Astro.site
   <body
     class="font-body bg-surface text-on-surface antialiased transition-colors duration-300"
   >
-    <!-- Navbar -->
     <slot name="nav" />
 
-    <!-- Contenido principal -->
     <main>
       <slot />
     </main>
 
-    <!-- Footer -->
     <slot name="footer" />
 
-    <!-- Script: Intersection Observer para animaciones reveal -->
     <script>
       const observer = new IntersectionObserver(
         (entries) => {

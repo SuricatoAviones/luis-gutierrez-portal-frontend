@@ -1,20 +1,23 @@
 ---
 // src/pages/index.astro
-import Layout from '@/layouts/Layout.astro';
-import NavBar from '@/components/ui/NavBar.astro';
-import Footer from '@/components/ui/Footer.astro';
-import Hero from '@/components/home/Hero.astro';
-import About from '@/components/home/About.astro';
-import Skills from '@/components/home/Skills.astro';
-import Portfolio from '@/components/home/Portfolio.astro';
-import Experience from '@/components/home/Experience.astro';
-import BlogPreview from '@/components/home/BlogPreview.astro';
-import Contact from '@/components/home/Contact.astro';
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+import Hero from "@/components/home/Hero.astro";
+import About from "@/components/home/About.astro";
+import Skills from "@/components/home/Skills.astro";
+import Portfolio from "@/components/home/Portfolio.astro";
+import Experience from "@/components/home/Experience.astro";
+import BlogPreview from "@/components/home/BlogPreview.astro";
+import Contact from "@/components/home/Contact.astro";
 ---
 
-<Layout>
+<Layout
+  title="Luis Gutierrez | Ingeniero de Software Full Stack"
+  description="Portafolio de Luis Gutierrez, ingeniero de software full stack. Proyectos web, arquitectura escalable y artículos técnicos sobre desarrollo moderno."
+>
   <NavBar slot="nav" />
-  
+
   <Hero />
   <About />
   <Skills />

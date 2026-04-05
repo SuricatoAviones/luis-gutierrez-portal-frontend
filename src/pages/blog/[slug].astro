@@ -11,6 +11,7 @@ import {
   getFeaturedImage,
   stripHtml,
 } from "@/lib/wordpress";
+import { buildMetaDescription } from "@/lib/seo";
 
 // Necesario en output: 'static' — genera una página por cada post en el build
 export async function getStaticPaths() {
@@ -41,8 +42,12 @@ if (!post) {
   return Astro.redirect("/blog");
 }
 
+const postTitle = stripHtml(post.title.rendered);
 const featuredImage = getFeaturedImage(post);
-const description = stripHtml(post.excerpt.rendered).slice(0, 160);
+const description = buildMetaDescription(
+  stripHtml(post.excerpt.rendered),
+  `Lee ${postTitle} en el blog de Luis Angel Gutierrez sobre desarrollo full stack y arquitectura web.`,
+);
 const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
   year: "numeric",
   month: "long",
@@ -51,9 +56,10 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
 ---
 
 <Layout
-  title={`${post.title.rendered} · Blog de Luis Angel Gutierrez`}
+  title={`${postTitle} · Blog de Luis Angel Gutierrez`}
   description={description}
   image={featuredImage || undefined}
+  ogType="article"
 >
   <NavBar slot="nav" />
 
