@@ -4,10 +4,9 @@ import Layout from "@/layouts/Layout.astro";
 import Navbar from "@/components/ui/NavBar.astro";
 import Footer from "@/components/ui/Footer.astro";
 const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "";
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
 const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 const perPage = 9;
-const page = Number(Astro.url.searchParams.get("page") ?? "1");
 ---
 
 <Layout
@@ -79,12 +78,17 @@ const page = Number(Astro.url.searchParams.get("page") ?? "1");
   <Footer slot="footer" />
 </Layout>
 
-<script define:vars={{ wpApiBase, perPage, page }}>
+<script define:vars={{ wpApiBase, perPage }}>
   const loading = document.getElementById("blog-loading");
   const featuredContainer = document.getElementById("blog-featured");
   const gridContainer = document.getElementById("blog-grid");
   const emptyContainer = document.getElementById("blog-empty");
   const paginationContainer = document.getElementById("blog-pagination");
+  const currentPage = Number(
+    new URLSearchParams(window.location.search).get("page") ?? "1",
+  );
+  const page =
+    Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1;
 
   const stripHtml = (value) => {
     const doc = new DOMParser().parseFromString(value ?? "", "text/html");
@@ -105,7 +109,7 @@ const page = Number(Astro.url.searchParams.get("page") ?? "1");
   const getFeaturedImage = (post) =>
     post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
 
-  const postUrl = (slug) => `/blog/${encodeURIComponent(slug)}`;
+  const postUrl = (slug) => `/blog/post?slug=${encodeURIComponent(slug)}`;
 
   const createFeaturedCard = (post) => {
     const wrapper = document.createElement("a");

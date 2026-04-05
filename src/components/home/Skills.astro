@@ -1,7 +1,10 @@
 ---
 // src/components/home/Skills.astro
-import { getSkills, groupSkillsByCategory } from '../../lib/wordpress';
 import type { Skill } from '../../lib/wordpress';
+
+const wpApiBaseRaw =
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? '/wp-json';
+const wpApiBase = wpApiBaseRaw.replace(/\/$/, '');
 
 const fallbackSkills: Record<string, Skill[]> = {
   Frontend: [
@@ -31,19 +34,14 @@ const fallbackSkills: Record<string, Skill[]> = {
 
 let skillsByCategory = fallbackSkills;
 
-try {
-  const rawSkills = await getSkills();
-  if (rawSkills.length > 0) {
-    skillsByCategory = groupSkillsByCategory(rawSkills);
-  }
-} catch {
-  // Usa fallback si la API no responde
-}
-
 const categories = Object.keys(skillsByCategory);
 ---
 
-<section id="habilidades" class="py-24 lg:py-32 bg-surface-container">
+<section
+  id="habilidades"
+  class="py-24 lg:py-32 bg-surface-container"
+  data-api-base={wpApiBase}
+>
   <div class="max-w-content mx-auto px-6 lg:px-10">
 
     <!-- Encabezado de sección -->
@@ -101,27 +99,37 @@ const categories = Object.keys(skillsByCategory);
 </section>
 
 <script>
-  const tabs = document.querySelectorAll<HTMLButtonElement>('.skill-tab');
-  const panels = document.querySelectorAll<HTMLDivElement>('.skill-panel');
+  type SkillItem = {
+    title?: { rendered?: string };
+    acf?: { category?: string; level?: number };
+  };
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const cat = tab.dataset.category;
+  const section = document.getElementById('habilidades');
+  const tabContainer = document.getElementById('skill-tabs');
 
-      tabs.forEach((t) => {
-        t.classList.remove('bg-secondary-container', 'text-on-secondary-container');
-        t.classList.add('bg-surface-high', 'text-on-surface-variant');
+  const bindTabs = () => {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.skill-tab');
+    const panels = document.querySelectorAll<HTMLDivElement>('.skill-panel');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const cat = tab.dataset.category;
+
+        tabs.forEach((t) => {
+          t.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+          t.classList.add('bg-surface-high', 'text-on-surface-variant');
+        });
+        tab.classList.add('bg-secondary-container', 'text-on-secondary-container');
+        tab.classList.remove('bg-surface-high', 'text-on-surface-variant');
+
+        panels.forEach((panel) => {
+          panel.classList.toggle('hidden', panel.dataset.panel !== cat);
+        });
+
+        animateBars();
       });
-      tab.classList.add('bg-secondary-container', 'text-on-secondary-container');
-      tab.classList.remove('bg-surface-high', 'text-on-surface-variant');
-
-      panels.forEach((panel) => {
-        panel.classList.toggle('hidden', panel.dataset.panel !== cat);
-      });
-
-      animateBars();
     });
-  });
+  };
 
   function animateBars() {
     document.querySelectorAll<HTMLDivElement>('.skill-bar:not([data-animated])').forEach((bar) => {
@@ -139,5 +147,104 @@ const categories = Object.keys(skillsByCategory);
     });
   }
 
+  const renderSkills = (skills: SkillItem[]) => {
+    if (!tabContainer || !section || !Array.isArray(skills) || skills.length === 0) {
+      return;
+    }
+
+    const grouped = skills.reduce<Record<string, SkillItem[]>>((acc, skill) => {
+      const category = skill?.acf?.category || 'Otros';
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(skill);
+      return acc;
+    }, {});
+
+    const categories = Object.keys(grouped);
+    if (categories.length === 0) return;
+
+    tabContainer.innerHTML = '';
+
+    categories.forEach((cat, i) => {
+      const tab = document.createElement('button');
+      tab.dataset.category = cat;
+      tab.className =
+        'skill-tab px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ' +
+        (i === 0
+          ? 'bg-secondary-container text-on-secondary-container'
+          : 'bg-surface-high text-on-surface-variant hover:bg-surface-highest hover:text-on-surface');
+      tab.textContent = cat;
+      tabContainer.appendChild(tab);
+    });
+
+    section.querySelectorAll<HTMLDivElement>('.skill-panel').forEach((panel) => panel.remove());
+
+    categories.forEach((cat, i) => {
+      const panel = document.createElement('div');
+      panel.dataset.panel = cat;
+      panel.className =
+        `skill-panel ${i !== 0 ? 'hidden ' : ''}` +
+        'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+
+      grouped[cat].forEach((skill: SkillItem, j: number) => {
+        const level = Number(skill?.acf?.level ?? 0);
+
+        const card = document.createElement('div');
+        card.className =
+          'reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border';
+        card.style.animationDelay = `${j * 60}ms`;
+
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between mb-3';
+
+        const title = document.createElement('span');
+        title.className = 'font-body text-sm font-medium text-on-surface';
+        title.textContent = skill?.title?.rendered ?? 'Habilidad';
+
+        const pct = document.createElement('span');
+        pct.className = 'font-mono text-xs text-primary';
+        pct.textContent = `${level}%`;
+
+        header.append(title, pct);
+
+        const barWrap = document.createElement('div');
+        barWrap.className = 'h-1 bg-outline-variant/20 rounded-full overflow-hidden';
+
+        const bar = document.createElement('div');
+        bar.className =
+          'skill-bar h-full bg-primary rounded-full origin-left scale-x-0 transition-transform duration-700';
+        bar.style.setProperty('--level', String(Math.max(0, Math.min(100, level)) / 100));
+        bar.style.setProperty('transition-timing-function', 'var(--ease-expo)');
+        barWrap.appendChild(bar);
+
+        card.append(header, barWrap);
+        panel.appendChild(card);
+      });
+
+      section.querySelector('.max-w-content')?.appendChild(panel);
+    });
+
+    bindTabs();
+    animateBars();
+  };
+
+  const loadSkills = async () => {
+    const apiBase = section?.getAttribute('data-api-base')?.replace(/\/$/, '');
+    if (!apiBase) return;
+
+    try {
+      const response = await fetch(
+        `${apiBase}/wp/v2/skill?per_page=100&_fields=id,title,acf`,
+      );
+      if (!response.ok) return;
+
+      const skills = (await response.json()) as SkillItem[];
+      renderSkills(skills);
+    } catch {
+      // Mantiene fallback estatico si hay error de API/CORS.
+    }
+  };
+
+  bindTabs();
   animateBars();
+  loadSkills();
 </script>

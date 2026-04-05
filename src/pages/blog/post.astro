@@ -6,7 +6,7 @@ import Footer from "@/components/ui/Footer.astro";
 import Profile from "@/assets/profile.png";
 
 const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "";
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
 const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 ---
 

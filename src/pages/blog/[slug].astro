@@ -39,7 +39,9 @@ const { slug } = Astro.params;
 const post = await getPostBySlug(slug as string).catch(() => null);
 
 if (!post) {
-  return Astro.redirect("/blog");
+  return Astro.redirect(
+    `/blog/post?slug=${encodeURIComponent(slug as string)}`,
+  );
 }
 
 const postTitle = stripHtml(post.title.rendered);

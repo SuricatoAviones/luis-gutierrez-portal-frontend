@@ -1,7 +1,7 @@
 ---
 // src/components/home/BlogPreview.astro
 const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "";
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
 const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 
 const fallbackPosts = [
@@ -83,7 +83,7 @@ function formatPostDate(dateStr: string): string {
 
           return (
             <a
-              href={`/blog/${encodeURIComponent(post.slug)}`}
+              href={`/blog/post?slug=${encodeURIComponent(post.slug)}`}
               class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
               style={`animation-delay: ${delay}ms`}
             >
@@ -185,7 +185,7 @@ function formatPostDate(dateStr: string): string {
 
     const createPostCard = (post, index) => {
       const card = document.createElement("a");
-      card.href = `/blog/${encodeURIComponent(post.slug)}`;
+      card.href = `/blog/post?slug=${encodeURIComponent(post.slug)}`;
       card.className =
         "reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border";
       card.style.animationDelay = `${index * 100}ms`;
