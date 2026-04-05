@@ -1,6 +1,6 @@
 ---
 // src/layouts/Layout.astro
-import '@/styles/global.css';
+import "@/styles/global.css";
 
 interface Props {
   title?: string;
@@ -9,9 +9,9 @@ interface Props {
 }
 
 const {
-  title = 'Luis Angel Gutierrez — Full Stack Developer',
-  description = 'Portfolio personal de Luis Angel Gutierrez, desarrollador Full Stack especializado en crear experiencias web modernas y eficientes.',
-  image = '/og-image.png',
+  title = "Luis Gutierrez — Ingeniero de Software",
+  description = "Portafolio y blog técnico de Luis Gutierrez. Ingeniería de software, arquitectura web y diseño de producto.",
+  image = "/og-image.png",
 } = Astro.props;
 
 const canonicalURL = Astro.site
@@ -25,7 +25,7 @@ const canonicalURL = Astro.site
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <meta name="author" content="Luis Angel Gutierrez" />
+    <meta name="author" content="Luis Gutierrez" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -43,18 +43,31 @@ const canonicalURL = Astro.site
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Google Fonts: Playfair Display + DM Sans + JetBrains Mono -->
+    <!-- Google Fonts: Newsreader + Manrope + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Theme: prevent flash of wrong color scheme -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        if (stored === "dark") document.documentElement.classList.add("dark");
+        else if (stored === "light")
+          document.documentElement.classList.add("light");
+        // If no stored preference, CSS handles prefers-color-scheme automatically
+      })();
+    </script>
 
     <title>{title}</title>
   </head>
 
-  <body class="font-sans bg-parchment text-ink antialiased">
+  <body
+    class="font-body bg-surface text-on-surface antialiased transition-colors duration-300"
+  >
     <!-- Navbar -->
     <slot name="nav" />
 
@@ -72,15 +85,17 @@ const canonicalURL = Astro.site
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
+              entry.target.classList.add("visible");
               observer.unobserve(entry.target);
             }
           });
         },
-        { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+        { threshold: 0.1, rootMargin: "0px 0px -60px 0px" },
       );
 
-      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
     </script>
   </body>
 </html>

@@ -1,31 +1,31 @@
 ---
-// src/components/sections/BlogPreview.astro
+// src/components/home/BlogPreview.astro
 import { getLatestPosts, getFeaturedImage, stripHtml } from '../../lib/wordpress';
 import type { WPPost } from '../../lib/wordpress';
 
 const fallbackPosts: WPPost[] = [
   {
     id: 1,
-    slug: 'primer-post',
+    slug: 'sistemas-distribuidos',
     date: '2024-03-01T00:00:00',
-    title: { rendered: 'Construyendo un Headless CMS con WordPress y Astro' },
-    excerpt: { rendered: '<p>Aprende cómo separar el frontend de WordPress para obtener rendimiento, flexibilidad y la mejor experiencia de desarrollo posible.</p>' },
+    title: { rendered: 'Arquitectura de Sistemas Distribuidos: Guía Práctica' },
+    excerpt: { rendered: '<p>Explora los patrones fundamentales para diseñar sistemas distribuidos escalables y resilientes en producción.</p>' },
     content: { rendered: '' },
   },
   {
     id: 2,
-    slug: 'segundo-post',
+    slug: 'etica-ia',
     date: '2024-02-15T00:00:00',
-    title: { rendered: 'TypeScript para desarrolladores JavaScript: la guía definitiva' },
-    excerpt: { rendered: '<p>Todo lo que necesitas saber para migrar tu proyecto a TypeScript sin morir en el intento, con ejemplos prácticos y patrones reales.</p>' },
+    title: { rendered: 'Ética en Inteligencia Artificial: Perspectiva de un Ingeniero' },
+    excerpt: { rendered: '<p>Reflexiones sobre la responsabilidad técnica y ética al desarrollar sistemas de IA para productos reales.</p>' },
     content: { rendered: '' },
   },
   {
     id: 3,
-    slug: 'tercer-post',
+    slug: 'tipografia-dinamica',
     date: '2024-01-20T00:00:00',
-    title: { rendered: 'Arquitectura limpia en Node.js: más allá del MVC' },
-    excerpt: { rendered: '<p>Exploramos cómo estructurar aplicaciones Node.js escalables utilizando principios de Clean Architecture y Domain-Driven Design.</p>' },
+    title: { rendered: 'Tipografía Dinámica en la Web Moderna' },
+    excerpt: { rendered: '<p>Cómo implementar sistemas tipográficos fluidos que se adaptan al contexto del usuario y mejoran la legibilidad.</p>' },
     content: { rendered: '' },
   },
 ];
@@ -48,19 +48,19 @@ function formatPostDate(dateStr: string): string {
 }
 ---
 
-<section id="blog" class="py-24 lg:py-32">
+<section id="blog" class="py-24 lg:py-32 bg-surface-container">
   <div class="max-w-content mx-auto px-6 lg:px-10">
 
     <!-- Encabezado de sección -->
     <div class="flex items-center justify-between mb-16 reveal">
       <div class="flex items-center gap-4">
-        <span class="font-mono text-2xs text-accent uppercase tracking-widest">05</span>
-        <span class="block w-8 h-px bg-accent"></span>
-        <h2 class="font-display text-3xl lg:text-4xl font-semibold text-ink">Blog</h2>
+        <span class="font-mono text-2xs text-primary uppercase tracking-widest">05</span>
+        <span class="block w-8 h-px bg-primary"></span>
+        <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Pensamiento Técnico</h2>
       </div>
       <a
         href="/blog"
-        class="hidden sm:inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors"
+        class="hidden sm:inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
       >
         Ver todos
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -79,11 +79,11 @@ function formatPostDate(dateStr: string): string {
         return (
           <a
             href={`/blog/${post.slug}`}
-            class="reveal group flex flex-col bg-parchment border border-border rounded-2xl overflow-hidden hover:border-accent/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
             style={`animation-delay: ${delay}ms`}
           >
             <!-- Imagen -->
-            <div class="relative aspect-video bg-accent-light overflow-hidden">
+            <div class="relative aspect-video bg-surface-container overflow-hidden">
               {img ? (
                 <img
                   src={img}
@@ -93,27 +93,30 @@ function formatPostDate(dateStr: string): string {
                 />
               ) : (
                 <div class="w-full h-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-accent/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primary/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                   </svg>
                 </div>
               )}
+              <!-- Accent top trim -->
+              <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-container"></div>
             </div>
 
             <!-- Contenido -->
             <div class="flex flex-col flex-1 p-5">
-              <p class="font-mono text-2xs text-muted uppercase tracking-wider mb-3">
+              <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3">
                 {formatPostDate(post.date)}
               </p>
-              <h3 class="font-display text-lg font-semibold text-ink leading-snug mb-3 group-hover:text-accent transition-colors line-clamp-2">
+              <h3 class="font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2">
                 {post.title.rendered}
               </h3>
-              <p class="text-sm text-muted leading-relaxed flex-1 line-clamp-3">
+              <p class="text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
                 {excerpt}
               </p>
-              <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                <span class="text-xs font-medium text-accent">Leer artículo</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <div class="mt-4 pt-4 flex items-center justify-between"
+                   style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);">
+                <span class="text-xs font-medium text-primary">Leer artículo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </div>
@@ -125,10 +128,9 @@ function formatPostDate(dateStr: string): string {
 
     <!-- Ver todos mobile -->
     <div class="mt-10 text-center sm:hidden reveal">
-      <a href="/blog" class="inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors">
+      <a href="/blog" class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors">
         Ver todos los artículos →
       </a>
     </div>
-
   </div>
 </section>

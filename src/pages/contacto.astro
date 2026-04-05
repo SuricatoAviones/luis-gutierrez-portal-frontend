@@ -1,9 +1,9 @@
 ---
 // src/pages/contacto.astro
-import Layout from '@/layouts/Layout.astro';
-import Navbar from '@/components/ui/NavBar.astro';
-import Footer from '@/components/ui/Footer.astro';
-import Contact from '@/components/home/Contact.astro';
+import Layout from "@/layouts/Layout.astro";
+import Navbar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+import Contact from "@/components/home/Contact.astro";
 ---
 
 <Layout
@@ -13,19 +13,26 @@ import Contact from '@/components/home/Contact.astro';
   <Navbar slot="nav" />
 
   <!-- Encabezado de la página -->
-  <section class="py-20 border-b border-border">
+  <section
+    class="py-20"
+    style="border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+  >
     <div class="max-w-content mx-auto px-6 lg:px-10">
       <div class="flex items-center gap-4 mb-6">
-        <span class="block w-8 h-px bg-accent"></span>
-        <span class="font-mono text-xs text-accent uppercase tracking-widest">Hablemos</span>
+        <span class="block w-8 h-px bg-primary"></span>
+        <span class="font-mono text-xs text-primary uppercase tracking-widest"
+          >Hablemos</span
+        >
       </div>
-      <h1 class="font-display text-5xl lg:text-6xl font-bold text-ink leading-tight">
+      <h1
+        class="font-headline text-5xl lg:text-6xl font-bold text-on-surface leading-tight"
+      >
         ¿Tienes un proyecto<br />
-        <em class="text-accent font-normal italic">en mente?</em>
+        <em class="text-primary font-normal italic">en mente?</em>
       </h1>
-      <p class="mt-6 max-w-lg text-muted text-lg font-light">
-        Estoy disponible para proyectos freelance, colaboraciones y oportunidades remotas.
-        No dudes en escribirme.
+      <p class="mt-6 max-w-lg text-on-surface-variant text-lg font-light">
+        Estoy disponible para proyectos freelance, colaboraciones y
+        oportunidades remotas. No dudes en escribirme.
       </p>
     </div>
   </section>

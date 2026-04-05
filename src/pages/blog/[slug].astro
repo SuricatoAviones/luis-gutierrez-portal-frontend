@@ -1,17 +1,22 @@
 ---
 // src/pages/blog/[slug].astro
-import Layout from '@/layouts/Layout.astro';
-import NavBar from '@/components/ui/NavBar.astro';
-import Footer from '@/components/ui/Footer.astro';
-import { getPosts, getPostBySlug, getFeaturedImage, stripHtml } from '@/lib/wordpress';
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+import {
+  getPosts,
+  getPostBySlug,
+  getFeaturedImage,
+  stripHtml,
+} from "@/lib/wordpress";
 
 // Necesario en output: 'static' — genera una página por cada post en el build
 export async function getStaticPaths() {
   // Slugs de fallback — deben coincidir con los de BlogPreview.astro
   const fallbackSlugs = [
-    { params: { slug: 'primer-post' } },
-    { params: { slug: 'segundo-post' } },
-    { params: { slug: 'tercer-post' } },
+    { params: { slug: "sistemas-distribuidos" } },
+    { params: { slug: "etica-ia" } },
+    { params: { slug: "tipografia-dinamica" } },
   ];
 
   try {
@@ -31,15 +36,15 @@ const { slug } = Astro.params;
 const post = await getPostBySlug(slug as string).catch(() => null);
 
 if (!post) {
-  return Astro.redirect('/blog');
+  return Astro.redirect("/blog");
 }
 
 const featuredImage = getFeaturedImage(post);
 const description = stripHtml(post.excerpt.rendered).slice(0, 160);
-const pubDate = new Date(post.date).toLocaleDateString('es-ES', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
+const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
 });
 ---
 
@@ -51,75 +56,121 @@ const pubDate = new Date(post.date).toLocaleDateString('es-ES', {
   <NavBar slot="nav" />
 
   <article class="max-w-3xl mx-auto px-6 lg:px-10 py-16">
-
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-xs text-muted mb-10" aria-label="breadcrumb">
-      <a href="/" class="hover:text-ink transition-colors">Inicio</a>
+    <nav
+      class="flex items-center gap-2 text-xs text-on-surface-variant mb-10"
+      aria-label="breadcrumb"
+    >
+      <a href="/" class="hover:text-on-surface transition-colors">Inicio</a>
       <span>/</span>
-      <a href="/blog" class="hover:text-ink transition-colors">Blog</a>
+      <a href="/blog" class="hover:text-on-surface transition-colors">Blog</a>
       <span>/</span>
-      <span class="text-ink truncate max-w-[200px]" set:html={post.title.rendered} />
+      <span
+        class="text-on-surface truncate max-w-[200px]"
+        set:html={post.title.rendered}
+      />
     </nav>
 
     <!-- Cabecera del artículo -->
     <header class="mb-10">
-      <p class="font-mono text-xs text-accent uppercase tracking-widest mb-4">{pubDate}</p>
+      <p class="font-mono text-xs text-primary uppercase tracking-widest mb-4">
+        {pubDate}
+      </p>
 
       <h1
-        class="font-display text-4xl lg:text-5xl font-bold text-ink leading-tight mb-6"
+        class="font-headline text-4xl lg:text-5xl font-bold text-on-surface leading-tight mb-6"
         set:html={post.title.rendered}
       />
 
-      {post.excerpt.rendered && (
-        <p class="text-lg text-muted font-light leading-relaxed" set:html={post.excerpt.rendered} />
-      )}
+      {
+        post.excerpt.rendered && (
+          <p
+            class="text-lg text-on-surface-variant font-light leading-relaxed"
+            set:html={post.excerpt.rendered}
+          />
+        )
+      }
 
       <!-- Separador -->
       <div class="mt-8 flex items-center gap-4">
-        <span class="block flex-1 h-px bg-border"></span>
-        <span class="font-mono text-2xs text-muted uppercase tracking-wider">Luis Angel Gutierrez</span>
-        <span class="block flex-1 h-px bg-border"></span>
+        <span
+          class="block flex-1 h-px"
+          style="background: color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+        ></span>
+        <span
+          class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider"
+          >Luis Angel Gutierrez</span
+        >
+        <span
+          class="block flex-1 h-px"
+          style="background: color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+        ></span>
       </div>
     </header>
 
     <!-- Imagen destacada -->
-    {featuredImage && (
-      <div class="mb-12 rounded-2xl overflow-hidden aspect-video">
-        <img
-          src={featuredImage}
-          alt={post.title.rendered}
-          class="w-full h-full object-cover"
-        />
-      </div>
-    )}
+    {
+      featuredImage && (
+        <div class="mb-12 rounded-xl overflow-hidden aspect-video">
+          <img
+            src={featuredImage}
+            alt={post.title.rendered}
+            class="w-full h-full object-cover"
+          />
+        </div>
+      )
+    }
 
     <!-- Contenido del post -->
     <div
-      class="prose-content leading-relaxed text-ink/90"
+      class="prose-content leading-relaxed text-on-surface/90"
       set:html={post.content.rendered}
     />
 
     <!-- Pie del artículo -->
-    <footer class="mt-16 pt-8 border-t border-border">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+    <footer
+      class="mt-16 pt-8"
+      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+    >
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+      >
         <!-- Autor -->
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full bg-accent-light overflow-hidden flex-shrink-0">
-            <img src="/profile.jpg" alt="Luis Angel Gutierrez" class="w-full h-full object-cover" />
+          <div
+            class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex-shrink-0"
+          >
+            <img
+              src="/profile.jpg"
+              alt="Luis Angel Gutierrez"
+              class="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <p class="text-sm font-semibold text-ink">Luis Angel Gutierrez</p>
-            <p class="text-xs text-muted">Full Stack Developer</p>
+            <p class="text-sm font-semibold text-on-surface">
+              Luis Angel Gutierrez
+            </p>
+            <p class="text-xs text-on-surface-variant">Full Stack Developer</p>
           </div>
         </div>
 
         <!-- Volver al blog -->
         <a
           href="/blog"
-          class="inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition-colors"
+          class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4 rotate-180"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
           </svg>
           Volver al blog
         </a>
@@ -133,44 +184,41 @@ const pubDate = new Date(post.date).toLocaleDateString('es-ES', {
 <style>
   @reference "@/styles/global.css";
 
-  /*
-   * Estilos para el contenido HTML de WordPress.
-   * @reference permite usar @apply con las clases del tema personalizado.
-   */
   .prose-content :global(h2) {
-    @apply font-display text-2xl font-semibold text-ink mt-10 mb-4;
+    @apply font-headline text-2xl font-semibold text-on-surface mt-10 mb-4;
   }
   .prose-content :global(h3) {
-    @apply font-display text-xl font-semibold text-ink mt-8 mb-3;
+    @apply font-headline text-xl font-semibold text-on-surface mt-8 mb-3;
   }
   .prose-content :global(p) {
-    @apply text-base text-ink/80 mb-5 leading-relaxed;
+    @apply text-base text-on-surface/80 mb-5 leading-relaxed;
   }
   .prose-content :global(a) {
-    @apply text-accent underline underline-offset-2 hover:text-accent/80 transition-colors;
+    @apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
   }
   .prose-content :global(ul) {
-    @apply list-disc list-inside mb-5 space-y-1 text-ink/80;
+    @apply list-disc list-inside mb-5 space-y-1 text-on-surface/80;
   }
   .prose-content :global(ol) {
-    @apply list-decimal list-inside mb-5 space-y-1 text-ink/80;
+    @apply list-decimal list-inside mb-5 space-y-1 text-on-surface/80;
   }
   .prose-content :global(blockquote) {
-    @apply border-l-4 border-accent pl-5 my-6 italic text-muted;
+    @apply border-l-4 border-primary pl-5 my-6 italic text-on-surface-variant;
   }
   .prose-content :global(pre) {
-    @apply font-mono text-sm bg-ink text-parchment p-5 rounded-xl overflow-x-auto my-6;
+    @apply font-mono text-sm bg-surface-container text-on-surface p-5 rounded-xl overflow-x-auto my-6;
   }
   .prose-content :global(code:not(pre code)) {
-    @apply font-mono text-sm text-accent bg-accent-light px-1.5 py-0.5 rounded;
+    @apply font-mono text-sm text-primary bg-surface-container px-1.5 py-0.5 rounded;
   }
   .prose-content :global(img) {
     @apply rounded-xl my-8 w-full;
   }
   .prose-content :global(hr) {
-    @apply border-border my-10;
+    @apply my-10;
+    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
   }
   .prose-content :global(strong) {
-    @apply font-semibold text-ink;
+    @apply font-semibold text-on-surface;
   }
 </style>

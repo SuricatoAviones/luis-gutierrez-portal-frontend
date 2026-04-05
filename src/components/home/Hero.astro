@@ -1,104 +1,156 @@
 ---
-// src/components/sections/Hero.astro
+// src/components/home/Hero.astro
 ---
 
 <section
   id="inicio"
   class="relative min-h-[90vh] flex flex-col justify-center overflow-hidden"
 >
-  <!-- Decoración de fondo: línea diagonal sutil -->
-  <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-    <div class="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-accent/5 blur-3xl"></div>
-    <div class="absolute bottom-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-border to-transparent opacity-60"></div>
+  <!-- Decoración de fondo -->
+  <div
+    class="absolute inset-0 pointer-events-none overflow-hidden"
+    aria-hidden="true"
+  >
+    <div
+      class="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl"
+    >
+    </div>
+    <div
+      class="absolute bottom-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-outline-variant/30 to-transparent opacity-60"
+    >
+    </div>
   </div>
 
   <div class="max-w-content mx-auto px-6 lg:px-10 py-24 relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
       <!-- Columna de texto -->
       <div class="lg:col-span-8">
-
         <!-- Etiqueta superior -->
         <div class="flex items-center gap-3 mb-8 animate-fade-in">
-          <span class="block w-8 h-px bg-accent"></span>
-          <span class="font-mono text-xs text-accent uppercase tracking-widest">
-            Full Stack Developer
+          <span class="block w-8 h-px bg-primary"></span>
+          <span
+            class="font-mono text-xs text-primary uppercase tracking-widest"
+          >
+            Ingeniero de Software & Diseñador de Producto
           </span>
         </div>
 
-        <!-- Nombre / Heading principal -->
-        <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-ink animate-fade-up">
-          Hola, soy<br />
-          <span class="text-accent">Luis Angel</span><br />
-          <span class="text-muted font-normal italic">Gutierrez.</span>
+        <!-- Heading principal -->
+        <h1
+          class="font-headline text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-on-surface animate-fade-up"
+        >
+          Construyendo el<br />
+          <span class="text-primary">futuro digital</span><br />
+          <span class="text-on-surface-variant font-normal italic"
+            >con precisión técnica.</span
+          >
         </h1>
 
         <!-- Descripción -->
-        <p class="mt-8 max-w-xl text-lg text-muted leading-relaxed font-light animate-fade-up [animation-delay:150ms]">
-          Creo experiencias web de punta a punta — desde una interfaz cuidada hasta
-          una arquitectura de servidor sólida. Me apasiona el código limpio y
-          los productos que resuelven problemas reales.
+        <p
+          class="mt-8 max-w-xl text-lg text-on-surface-variant leading-relaxed font-light animate-fade-up [animation-delay:150ms]"
+        >
+          Creo experiencias web de punta a punta — desde una interfaz cuidada
+          hasta una arquitectura de servidor sólida. Me apasiona el código
+          limpio y los productos que resuelven problemas reales.
         </p>
 
         <!-- CTAs -->
-        <div class="mt-10 flex flex-wrap items-center gap-4 animate-fade-up [animation-delay:250ms]">
+        <div
+          class="mt-10 flex flex-wrap items-center gap-4 animate-fade-up [animation-delay:250ms]"
+        >
           <a
             href="/#portafolio"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-ink text-parchment text-sm font-medium rounded-full hover:bg-accent transition-colors duration-300"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-300"
           >
-            Ver proyectos
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            Explorar Proyectos
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
             </svg>
           </a>
           <a
-            href="/contacto"
-            class="inline-flex items-center gap-2 px-6 py-3 border border-border text-ink text-sm font-medium rounded-full hover:border-accent hover:text-accent transition-colors duration-300"
+            href="/#sobre-mi"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-surface-high text-primary text-sm font-medium rounded-md hover:bg-surface-highest transition-colors duration-300"
           >
-            Contáctame
+            Mi Historia
           </a>
         </div>
       </div>
 
       <!-- Columna decorativa derecha -->
-      <div class="hidden lg:flex lg:col-span-4 justify-end items-center animate-fade-in [animation-delay:300ms]">
+      <div
+        class="hidden lg:flex lg:col-span-4 justify-end items-center animate-fade-in [animation-delay:300ms]"
+      >
         <div class="relative w-64 h-64">
-          <!-- Círculo de fondo -->
-          <div class="absolute inset-0 rounded-full border border-border"></div>
-          <div class="absolute inset-4 rounded-full border border-border/50"></div>
+          <div
+            class="absolute inset-0 rounded-full"
+            style="border: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+          >
+          </div>
+          <div
+            class="absolute inset-4 rounded-full"
+            style="border: 1px solid color-mix(in srgb, var(--outline-variant) 10%, transparent);"
+          >
+          </div>
 
-          <!-- Foto placeholder — reemplaza src con tu foto real -->
-          <div class="absolute inset-8 rounded-full overflow-hidden bg-accent-light">
+          <!-- Foto -->
+          <div
+            class="absolute inset-8 rounded-full overflow-hidden bg-surface-container"
+          >
             <img
               src="/profile.jpg"
-              alt="Luis Angel Gutierrez"
+              alt="Luis Gutierrez"
               class="w-full h-full object-cover"
               loading="eager"
             />
           </div>
 
           <!-- Etiqueta flotante -->
-          <div class="absolute -bottom-4 -right-4 bg-parchment border border-border rounded-2xl px-4 py-2 shadow-sm">
-            <p class="font-mono text-2xs text-muted uppercase tracking-wider">Available</p>
-            <p class="font-sans text-xs font-medium text-ink">Para proyectos</p>
+          <div
+            class="absolute -bottom-4 -right-4 bg-surface-container rounded-xl px-4 py-2 ghost-border"
+          >
+            <p
+              class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider"
+            >
+              Disponible
+            </p>
+            <p class="font-body text-xs font-medium text-on-surface">
+              Para proyectos
+            </p>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Stats / números rápidos -->
-    <div class="mt-20 pt-10 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-8 animate-fade-up [animation-delay:400ms]">
-      {[
-        { value: '3+',    label: 'Años de experiencia' },
-        { value: '20+',   label: 'Proyectos completados' },
-        { value: '100%',  label: 'Compromiso' },
-      ].map(({ value, label }) => (
-        <div>
-          <p class="font-display text-4xl font-bold text-ink">{value}</p>
-          <p class="mt-1 text-sm text-muted">{label}</p>
-        </div>
-      ))}
+    <!-- Stats -->
+    <div
+      class="mt-20 pt-10 grid grid-cols-2 sm:grid-cols-3 gap-8 animate-fade-up [animation-delay:400ms]"
+      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+    >
+      {
+        [
+          { value: "3+", label: "Años de experiencia" },
+          { value: "20+", label: "Proyectos completados" },
+          { value: "100%", label: "Compromiso" },
+        ].map(({ value, label }) => (
+          <div>
+            <p class="font-headline text-4xl font-bold text-on-surface">
+              {value}
+            </p>
+            <p class="mt-1 text-sm text-on-surface-variant">{label}</p>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

@@ -1,15 +1,15 @@
 ---
-// src/components/sections/Experience.astro
+// src/components/home/Experience.astro
 import { getExperiences, formatDate, parseTechs } from '../../lib/wordpress';
 import type { Experience } from '../../lib/wordpress';
 
 const fallbackExperiences: Experience[] = [
   {
     id: 1,
-    title: { rendered: 'Desarrollador Full Stack Senior' },
+    title: { rendered: 'Senior Software Engineer' },
     acf: {
-      company: 'Empresa Tech S.A.',
-      position: 'Full Stack Developer Sr.',
+      company: 'TechInnovate',
+      position: 'Senior Software Engineer',
       start_date: '2022-03',
       end_date: 'presente',
       description:
@@ -20,10 +20,10 @@ const fallbackExperiences: Experience[] = [
   },
   {
     id: 2,
-    title: { rendered: 'Desarrollador Frontend' },
+    title: { rendered: 'Full-Stack Developer' },
     acf: {
-      company: 'Agencia Digital XYZ',
-      position: 'Frontend Developer',
+      company: 'Creative Minds',
+      position: 'Full-Stack Developer',
       start_date: '2020-06',
       end_date: '2022-02',
       description:
@@ -34,14 +34,14 @@ const fallbackExperiences: Experience[] = [
   },
   {
     id: 3,
-    title: { rendered: 'Desarrollador WordPress' },
+    title: { rendered: 'WordPress Developer' },
     acf: {
       company: 'Freelance',
       position: 'WordPress Developer',
       start_date: '2019-01',
       end_date: '2020-05',
       description:
-        'Creé sitios web y tiendas en línea con WordPress y WooCommerce. Desarrollo de plugins personalizados y temas a medida para clientes de distintos sectores.',
+        'Creé sitios web y tiendas en línea con WordPress y WooCommerce. Desarrollo de plugins personalizados y temas a medida.',
       technologies: 'WordPress, PHP, ACF, WooCommerce, CSS',
       company_url: '',
     },
@@ -58,20 +58,19 @@ try {
 }
 ---
 
-<section id="experiencia" class="py-24 lg:py-32 bg-parchment">
+<section id="experiencia" class="py-24 lg:py-32">
   <div class="max-w-content mx-auto px-6 lg:px-10">
 
     <!-- Encabezado de sección -->
     <div class="flex items-center gap-4 mb-16 reveal">
-      <span class="font-mono text-2xs text-accent uppercase tracking-widest">04</span>
-      <span class="block w-8 h-px bg-accent"></span>
-      <h2 class="font-display text-3xl lg:text-4xl font-semibold text-ink">Experiencia</h2>
+      <span class="font-mono text-2xs text-primary uppercase tracking-widest">04</span>
+      <span class="block w-8 h-px bg-primary"></span>
+      <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Trayectoria Profesional</h2>
     </div>
 
     <!-- Timeline -->
     <div class="relative">
-      <!-- Línea vertical -->
-      <div class="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-accent via-border to-transparent" aria-hidden="true"></div>
+      <div class="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-outline-variant/30 to-transparent" aria-hidden="true"></div>
 
       <div class="space-y-12">
         {experiences.map((exp, i) => {
@@ -82,27 +81,26 @@ try {
 
           return (
             <div class="relative pl-14 sm:pl-20 reveal" style={`animation-delay: ${i * 100}ms`}>
-
               <!-- Punto en la línea -->
               <div class="absolute left-0 sm:left-2 top-1.5 flex items-center justify-center">
-                <div class={`w-5 h-5 rounded-full border-2 flex items-center justify-center
+                <div class={`w-5 h-5 rounded-full flex items-center justify-center
                   ${isCurrent
-                    ? 'border-accent bg-accent'
-                    : 'border-border bg-parchment'
+                    ? 'bg-primary'
+                    : 'bg-surface-container'
                   }`}
+                  style={isCurrent ? '' : `border: 2px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);`}
                 >
                   {isCurrent && (
-                    <div class="w-2 h-2 rounded-full bg-parchment"></div>
+                    <div class="w-2 h-2 rounded-full bg-on-primary"></div>
                   )}
                 </div>
               </div>
 
               <!-- Tarjeta de experiencia -->
-              <div class="bg-white border border-border rounded-2xl p-6 hover:border-accent/30 hover:shadow-md transition-all duration-300">
-                <!-- Cabecera -->
+              <div class="bg-surface-low rounded-xl p-6 ghost-border hover:bg-surface-highest transition-all duration-300">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
                   <div>
-                    <h3 class="font-display text-lg font-semibold text-ink">
+                    <h3 class="font-headline text-lg font-semibold text-on-surface">
                       {exp.acf.position || exp.title.rendered}
                     </h3>
                     <div class="flex items-center gap-2 mt-1">
@@ -111,39 +109,37 @@ try {
                           href={exp.acf.company_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="text-sm font-medium text-accent hover:underline"
+                          class="text-sm font-medium text-primary hover:underline"
                         >
                           {exp.acf.company}
                         </a>
                       ) : (
-                        <span class="text-sm font-medium text-accent">{exp.acf.company}</span>
+                        <span class="text-sm font-medium text-primary">{exp.acf.company}</span>
                       )}
                     </div>
                   </div>
 
-                  <!-- Fechas -->
                   <div class="flex-shrink-0 text-right">
                     <span class={`inline-flex items-center font-mono text-2xs px-3 py-1 rounded-full uppercase tracking-wider ${
                       isCurrent
-                        ? 'bg-accent/10 text-accent'
-                        : 'bg-border/60 text-muted'
+                        ? 'bg-primary-container text-on-primary-container'
+                        : 'bg-surface-high text-on-surface-variant'
                     }`}>
-                      {isCurrent && <span class="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>}
+                      {isCurrent && <span class="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>}
                       {startStr} — {endStr}
                     </span>
                   </div>
                 </div>
 
-                <!-- Descripción -->
-                <p class="text-sm text-muted leading-relaxed mb-4">
+                <p class="text-sm text-on-surface-variant leading-relaxed mb-4">
                   {exp.acf.description}
                 </p>
 
-                <!-- Stack -->
                 {techs.length > 0 && (
-                  <div class="flex flex-wrap gap-2 pt-4 border-t border-border">
+                  <div class="flex flex-wrap gap-2 pt-4"
+                       style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);">
                     {techs.map((tech) => (
-                      <span class="font-mono text-2xs text-muted bg-border/40 px-2.5 py-1 rounded-full">
+                      <span class="font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full">
                         {tech}
                       </span>
                     ))}
@@ -155,6 +151,5 @@ try {
         })}
       </div>
     </div>
-
   </div>
 </section>

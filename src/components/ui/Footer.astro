@@ -1,48 +1,61 @@
 ---
-// src/components/Footer.astro
+// src/components/ui/Footer.astro
 const year = new Date().getFullYear();
 
 const socialLinks = [
-  { href: 'https://github.com/tu-usuario',           label: 'GitHub' },
-  { href: 'https://linkedin.com/in/tu-usuario',      label: 'LinkedIn' },
-  { href: 'https://twitter.com/tu-usuario',          label: 'Twitter/X' },
+  { href: "https://github.com/tu-usuario", label: "GitHub" },
+  { href: "https://linkedin.com/in/tu-usuario", label: "LinkedIn" },
+  { href: "https://twitter.com/tu-usuario", label: "Twitter/X" },
 ];
 ---
 
-<footer class="border-t border-border bg-parchment">
+<footer class="bg-surface-container">
   <div class="max-w-content mx-auto px-6 lg:px-10 py-12">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-
+    <div
+      class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+    >
       <!-- Logo + tagline -->
       <div>
-        <a href="/" class="font-display text-xl font-semibold text-ink hover:text-accent transition-colors">
-          LAG<span class="text-accent">.</span>
+        <a
+          href="/"
+          class="font-headline text-xl font-semibold text-on-surface hover:text-primary transition-colors"
+        >
+          LG<span class="text-primary">.</span>
         </a>
-        <p class="mt-1 text-sm text-muted">Desarrollador Full Stack · Construyendo con propósito.</p>
+        <p class="mt-1 text-sm text-on-surface-variant">
+          Ingeniero de Software · Construyendo con propósito.
+        </p>
       </div>
 
       <!-- Links sociales -->
       <div class="flex items-center gap-6">
-        {socialLinks.map(({ href, label }) => (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-sm text-muted hover:text-ink transition-colors duration-200"
-          >
-            {label}
-          </a>
-        ))}
+        {
+          socialLinks.map(({ href, label }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-200"
+            >
+              {label}
+            </a>
+          ))
+        }
       </div>
     </div>
 
     <!-- Línea inferior -->
-    <div class="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-      <p class="text-xs text-muted">
-        © {year} Luis Angel Gutierrez. Todos los derechos reservados.
+    <div
+      class="mt-8 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+    >
+      <p class="text-xs text-on-surface-variant">
+        © {year} Luis Gutierrez. Todos los derechos reservados.
       </p>
-      <p class="text-xs text-muted">
-        Construido con <span class="text-accent">Astro</span> + <span class="text-accent">Tailwind</span>
+      <p class="text-xs text-on-surface-variant">
+        Construido con <span class="text-primary">Astro</span> + <span
+          class="text-primary">Tailwind</span
+        >
       </p>
     </div>
   </div>

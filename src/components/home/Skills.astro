@@ -1,9 +1,8 @@
 ---
-// src/components/sections/Skills.astro
+// src/components/home/Skills.astro
 import { getSkills, groupSkillsByCategory } from '../../lib/wordpress';
 import type { Skill } from '../../lib/wordpress';
 
-// Datos de fallback en caso de que la API no esté lista
 const fallbackSkills: Record<string, Skill[]> = {
   Frontend: [
     { id: 1, title: { rendered: 'React' },      acf: { level: 90, category: 'Frontend', icon: '' } },
@@ -44,14 +43,14 @@ try {
 const categories = Object.keys(skillsByCategory);
 ---
 
-<section id="habilidades" class="py-24 lg:py-32 bg-ink text-parchment">
+<section id="habilidades" class="py-24 lg:py-32 bg-surface-container">
   <div class="max-w-content mx-auto px-6 lg:px-10">
 
     <!-- Encabezado de sección -->
     <div class="flex items-center gap-4 mb-16 reveal">
-      <span class="font-mono text-2xs text-accent uppercase tracking-widest">02</span>
-      <span class="block w-8 h-px bg-accent"></span>
-      <h2 class="font-display text-3xl lg:text-4xl font-semibold text-parchment">Habilidades</h2>
+      <span class="font-mono text-2xs text-primary uppercase tracking-widest">02</span>
+      <span class="block w-8 h-px bg-primary"></span>
+      <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Habilidades</h2>
     </div>
 
     <!-- Tabs de categorías -->
@@ -59,10 +58,10 @@ const categories = Object.keys(skillsByCategory);
       {categories.map((cat, i) => (
         <button
           data-category={cat}
-          class={`skill-tab px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+          class={`skill-tab px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
             i === 0
-              ? 'bg-accent border-accent text-parchment'
-              : 'border-parchment/20 text-parchment/50 hover:border-parchment/60 hover:text-parchment'
+              ? 'bg-secondary-container text-on-secondary-container'
+              : 'bg-surface-high text-on-surface-variant hover:bg-surface-highest hover:text-on-surface'
           }`}
         >
           {cat}
@@ -78,32 +77,30 @@ const categories = Object.keys(skillsByCategory);
       >
         {skillsByCategory[cat].map((skill, j) => (
           <div
-            class="reveal group bg-parchment/5 hover:bg-parchment/10 border border-parchment/10 rounded-xl p-5 transition-all duration-300"
+            class="reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border"
             style={`animation-delay: ${j * 60}ms`}
           >
             <div class="flex items-center justify-between mb-3">
-              <span class="font-sans text-sm font-medium text-parchment">
+              <span class="font-body text-sm font-medium text-on-surface">
                 {skill.title.rendered}
               </span>
-              <span class="font-mono text-xs text-accent">{skill.acf.level}%</span>
+              <span class="font-mono text-xs text-primary">{skill.acf.level}%</span>
             </div>
             <!-- Barra de nivel -->
-            <div class="h-1 bg-parchment/10 rounded-full overflow-hidden">
+            <div class="h-1 bg-outline-variant/20 rounded-full overflow-hidden">
               <div
-                class="skill-bar h-full bg-accent rounded-full origin-left scale-x-0 transition-transform duration-700 ease-expo"
-                style={`--level: ${skill.acf.level / 100}`}
+                class="skill-bar h-full bg-primary rounded-full origin-left scale-x-0 transition-transform duration-700"
+                style={`--level: ${skill.acf.level / 100}; transition-timing-function: var(--ease-expo);`}
               ></div>
             </div>
           </div>
         ))}
       </div>
     ))}
-
   </div>
 </section>
 
 <script>
-  // Tabs: mostrar/ocultar categorías
   const tabs = document.querySelectorAll<HTMLButtonElement>('.skill-tab');
   const panels = document.querySelectorAll<HTMLDivElement>('.skill-panel');
 
@@ -112,22 +109,20 @@ const categories = Object.keys(skillsByCategory);
       const cat = tab.dataset.category;
 
       tabs.forEach((t) => {
-        t.classList.remove('bg-accent', 'border-accent', 'text-parchment');
-        t.classList.add('border-parchment/20', 'text-parchment/50');
+        t.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+        t.classList.add('bg-surface-high', 'text-on-surface-variant');
       });
-      tab.classList.add('bg-accent', 'border-accent', 'text-parchment');
-      tab.classList.remove('border-parchment/20', 'text-parchment/50');
+      tab.classList.add('bg-secondary-container', 'text-on-secondary-container');
+      tab.classList.remove('bg-surface-high', 'text-on-surface-variant');
 
       panels.forEach((panel) => {
         panel.classList.toggle('hidden', panel.dataset.panel !== cat);
       });
 
-      // Animar barras del panel activo
       animateBars();
     });
   });
 
-  // Anima barras de nivel cuando son visibles
   function animateBars() {
     document.querySelectorAll<HTMLDivElement>('.skill-bar:not([data-animated])').forEach((bar) => {
       const observer = new IntersectionObserver((entries) => {
