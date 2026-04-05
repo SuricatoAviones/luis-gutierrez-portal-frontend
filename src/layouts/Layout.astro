@@ -85,21 +85,46 @@ const metaDescription = buildMetaDescription(description, defaultDescription);
     <slot name="footer" />
 
     <script>
-      const observer = new IntersectionObserver(
+      const revealObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
+              revealObserver.unobserve(entry.target);
             }
           });
         },
         { threshold: 0.1, rootMargin: "0px 0px -60px 0px" },
       );
 
-      document
-        .querySelectorAll(".reveal")
-        .forEach((el) => observer.observe(el));
+      const observeRevealElements = (root) => {
+        if (!(root instanceof Element || root instanceof Document)) return;
+
+        if (root instanceof Element && root.classList.contains("reveal")) {
+          revealObserver.observe(root);
+        }
+
+        root.querySelectorAll?.(".reveal").forEach((el) => {
+          revealObserver.observe(el);
+        });
+      };
+
+      observeRevealElements(document);
+
+      const domObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof Element) {
+              observeRevealElements(node);
+            }
+          });
+        });
+      });
+
+      domObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
     </script>
   </body>
 </html>
