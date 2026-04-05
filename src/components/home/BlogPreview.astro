@@ -1,136 +1,273 @@
 ---
 // src/components/home/BlogPreview.astro
-import { getLatestPosts, getFeaturedImage, stripHtml } from '../../lib/wordpress';
-import type { WPPost } from '../../lib/wordpress';
+const wpApiBaseRaw =
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "";
+const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 
-const fallbackPosts: WPPost[] = [
+const fallbackPosts = [
   {
-    id: 1,
-    slug: 'sistemas-distribuidos',
-    date: '2024-03-01T00:00:00',
-    title: { rendered: 'Arquitectura de Sistemas Distribuidos: Guía Práctica' },
-    excerpt: { rendered: '<p>Explora los patrones fundamentales para diseñar sistemas distribuidos escalables y resilientes en producción.</p>' },
-    content: { rendered: '' },
+    slug: "sistemas-distribuidos",
+    date: "2024-03-01T00:00:00",
+    title: "Arquitectura de Sistemas Distribuidos: Guia Practica",
+    excerpt:
+      "Explora los patrones fundamentales para disenar sistemas distribuidos escalables y resilientes en produccion.",
   },
   {
-    id: 2,
-    slug: 'etica-ia',
-    date: '2024-02-15T00:00:00',
-    title: { rendered: 'Ética en Inteligencia Artificial: Perspectiva de un Ingeniero' },
-    excerpt: { rendered: '<p>Reflexiones sobre la responsabilidad técnica y ética al desarrollar sistemas de IA para productos reales.</p>' },
-    content: { rendered: '' },
+    slug: "etica-ia",
+    date: "2024-02-15T00:00:00",
+    title: "Etica en Inteligencia Artificial: Perspectiva de un Ingeniero",
+    excerpt:
+      "Reflexiones sobre la responsabilidad tecnica y etica al desarrollar sistemas de IA para productos reales.",
   },
   {
-    id: 3,
-    slug: 'tipografia-dinamica',
-    date: '2024-01-20T00:00:00',
-    title: { rendered: 'Tipografía Dinámica en la Web Moderna' },
-    excerpt: { rendered: '<p>Cómo implementar sistemas tipográficos fluidos que se adaptan al contexto del usuario y mejoran la legibilidad.</p>' },
-    content: { rendered: '' },
+    slug: "tipografia-dinamica",
+    date: "2024-01-20T00:00:00",
+    title: "Tipografia Dinamica en la Web Moderna",
+    excerpt:
+      "Como implementar sistemas tipograficos fluidos que se adaptan al contexto del usuario y mejoran la legibilidad.",
   },
 ];
 
-let posts = fallbackPosts;
-
-try {
-  const fetched = await getLatestPosts(3);
-  if (fetched.length > 0) posts = fetched;
-} catch {
-  // Usa fallback
-}
-
 function formatPostDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return new Date(dateStr).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 ---
 
 <section id="blog" class="py-24 lg:py-32 bg-surface-container">
   <div class="max-w-content mx-auto px-6 lg:px-10">
-
-    <!-- Encabezado de sección -->
     <div class="flex items-center justify-between mb-16 reveal">
       <div class="flex items-center gap-4">
-        <span class="font-mono text-2xs text-primary uppercase tracking-widest">05</span>
+        <span class="font-mono text-2xs text-primary uppercase tracking-widest"
+          >05</span
+        >
         <span class="block w-8 h-px bg-primary"></span>
-        <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Pensamiento Técnico</h2>
+        <h2
+          class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface"
+        >
+          Pensamiento Tecnico
+        </h2>
       </div>
       <a
         href="/blog"
         class="hidden sm:inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
       >
         Ver todos
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
         </svg>
       </a>
     </div>
 
-    <!-- Posts grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {posts.map((post, i) => {
-        const img = getFeaturedImage(post);
-        const excerpt = stripHtml(post.excerpt.rendered);
-        const delay = i * 100;
+    <div
+      id="home-blog-preview-grid"
+      class="grid grid-cols-1 md:grid-cols-3 gap-6"
+      data-api-base={wpApiBase}
+    >
+      {
+        fallbackPosts.map((post, i) => {
+          const delay = i * 100;
 
-        return (
-          <a
-            href={`/blog/${post.slug}`}
-            class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
-            style={`animation-delay: ${delay}ms`}
-          >
-            <!-- Imagen -->
-            <div class="relative aspect-video bg-surface-container overflow-hidden">
-              {img ? (
-                <img
-                  src={img}
-                  alt={post.title.rendered}
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              ) : (
+          return (
+            <a
+              href={`/blog/post?slug=${post.slug}`}
+              class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
+              style={`animation-delay: ${delay}ms`}
+            >
+              <div class="relative aspect-video bg-surface-container overflow-hidden">
                 <div class="w-full h-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primary/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-10 h-10 text-primary/30"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                    />
                   </svg>
                 </div>
-              )}
-              <!-- Accent top trim -->
-              <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-container"></div>
-            </div>
-
-            <!-- Contenido -->
-            <div class="flex flex-col flex-1 p-5">
-              <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3">
-                {formatPostDate(post.date)}
-              </p>
-              <h3 class="font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                {post.title.rendered}
-              </h3>
-              <p class="text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
-                {excerpt}
-              </p>
-              <div class="mt-4 pt-4 flex items-center justify-between"
-                   style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);">
-                <span class="text-xs font-medium text-primary">Leer artículo</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-container" />
               </div>
-            </div>
-          </a>
-        );
-      })}
+
+              <div class="flex flex-col flex-1 p-5">
+                <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3">
+                  {formatPostDate(post.date)}
+                </p>
+                <h3 class="font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p class="text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
+                  {post.excerpt}
+                </p>
+                <div
+                  class="mt-4 pt-4 flex items-center justify-between"
+                  style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+                >
+                  <span class="text-xs font-medium text-primary">
+                    Leer articulo
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
+          );
+        })
+      }
     </div>
 
-    <!-- Ver todos mobile -->
     <div class="mt-10 text-center sm:hidden reveal">
-      <a href="/blog" class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors">
-        Ver todos los artículos →
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
+      >
+        Ver todos los articulos ->
       </a>
     </div>
   </div>
 </section>
+
+<script>
+  // @ts-nocheck
+  const grid = document.getElementById("home-blog-preview-grid");
+
+  if (grid) {
+    const apiBase = grid.getAttribute("data-api-base")?.replace(/\/$/, "");
+
+    const stripHtml = (value) => {
+      const doc = new DOMParser().parseFromString(value ?? "", "text/html");
+      return (doc.body.textContent ?? "").trim();
+    };
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime())
+        ? ""
+        : date.toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+    };
+
+    const getFeaturedImage = (post) =>
+      post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
+
+    const createPostCard = (post, index) => {
+      const card = document.createElement("a");
+      card.href = `/blog/post?slug=${encodeURIComponent(post.slug)}`;
+      card.className =
+        "reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border";
+      card.style.animationDelay = `${index * 100}ms`;
+
+      const imageWrapper = document.createElement("div");
+      imageWrapper.className =
+        "relative aspect-video bg-surface-container overflow-hidden";
+
+      const imageUrl = getFeaturedImage(post);
+      if (imageUrl) {
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = stripHtml(post.title?.rendered ?? "Post");
+        image.className =
+          "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105";
+        image.loading = "lazy";
+        imageWrapper.appendChild(image);
+      } else {
+        const imageFallback = document.createElement("div");
+        imageFallback.className =
+          "w-full h-full flex items-center justify-center";
+        imageFallback.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primary/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>';
+        imageWrapper.appendChild(imageFallback);
+      }
+
+      const trim = document.createElement("div");
+      trim.className =
+        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-container";
+      imageWrapper.appendChild(trim);
+
+      const body = document.createElement("div");
+      body.className = "flex flex-col flex-1 p-5";
+
+      const date = document.createElement("p");
+      date.className =
+        "font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3";
+      date.textContent = formatDate(post.date);
+
+      const title = document.createElement("h3");
+      title.className =
+        "font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2";
+      title.textContent = stripHtml(post.title?.rendered ?? "Sin titulo");
+
+      const excerpt = document.createElement("p");
+      excerpt.className =
+        "text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3";
+      excerpt.textContent = stripHtml(post.excerpt?.rendered ?? "");
+
+      const footer = document.createElement("div");
+      footer.className = "mt-4 pt-4 flex items-center justify-between";
+      footer.style.borderTop =
+        "1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent)";
+      footer.innerHTML =
+        '<span class="text-xs font-medium text-primary">Leer articulo</span><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>';
+
+      body.append(date, title, excerpt, footer);
+      card.append(imageWrapper, body);
+      return card;
+    };
+
+    const loadPosts = async () => {
+      if (!apiBase) return;
+
+      try {
+        const response = await fetch(
+          `${apiBase}/wp/v2/posts?per_page=3&page=1&_embed=1`,
+        );
+        if (!response.ok) return;
+
+        const posts = await response.json();
+        if (!Array.isArray(posts) || posts.length === 0) return;
+
+        grid.innerHTML = "";
+        posts.forEach((post, index) =>
+          grid.appendChild(createPostCard(post, index)),
+        );
+      } catch {
+        // Mantiene fallback estatico si hay error de API/CORS.
+      }
+    };
+
+    loadPosts();
+  }
+</script>

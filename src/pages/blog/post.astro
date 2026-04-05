@@ -1,0 +1,301 @@
+---
+import { Picture } from "astro:assets";
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+import Profile from "@/assets/profile.png";
+
+const wpApiBaseRaw =
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "";
+const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
+---
+
+<Layout
+  title="Articulo · Blog de Luis Angel Gutierrez"
+  description="Lectura dinamica conectada a WordPress."
+>
+  <NavBar slot="nav" />
+
+  <article class="max-w-3xl mx-auto px-6 lg:px-10 py-16">
+    <div id="blog-post-loading" class="text-center py-20">
+      <p class="font-headline text-2xl text-on-surface-variant">
+        Cargando articulo...
+      </p>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Consultando WordPress en tiempo real.
+      </p>
+    </div>
+
+    <div id="blog-post-error" class="text-center py-20 hidden">
+      <p class="font-headline text-2xl text-on-surface-variant">
+        No se pudo cargar el articulo
+      </p>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Verifica el slug o la conexion con WordPress.
+      </p>
+      <a
+        href="/blog"
+        class="inline-flex mt-6 items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+      >
+        Volver al blog
+      </a>
+    </div>
+
+    <div id="blog-post-content" class="hidden">
+      <nav
+        class="flex items-center gap-2 text-xs text-on-surface-variant mb-10"
+        aria-label="breadcrumb"
+      >
+        <a href="/" class="hover:text-on-surface transition-colors">Inicio</a>
+        <span>/</span>
+        <a href="/blog" class="hover:text-on-surface transition-colors">Blog</a>
+        <span>/</span>
+        <span
+          id="post-breadcrumb"
+          class="text-on-surface truncate max-w-[220px]"></span>
+      </nav>
+
+      <header class="mb-10">
+        <p
+          id="post-date"
+          class="font-mono text-xs text-primary uppercase tracking-widest mb-4"
+        >
+        </p>
+
+        <h1
+          id="post-title"
+          class="font-headline text-4xl lg:text-5xl font-bold text-on-surface leading-tight mb-6"
+        >
+        </h1>
+
+        <p
+          id="post-excerpt"
+          class="text-lg text-on-surface-variant font-light leading-relaxed"
+        >
+        </p>
+
+        <div class="mt-8 flex items-center gap-4">
+          <span
+            class="block flex-1 h-px"
+            style="background: color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+          ></span>
+          <span
+            class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider"
+            >Luis Angel Gutierrez</span
+          >
+          <span
+            class="block flex-1 h-px"
+            style="background: color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+          ></span>
+        </div>
+      </header>
+
+      <div
+        id="post-image-wrapper"
+        class="mb-12 rounded-xl overflow-hidden aspect-video hidden"
+      >
+        <div id="post-image-shell" class="w-full h-full" aria-hidden="true">
+          <Picture
+            src={Profile}
+            alt=""
+            class="w-full h-full object-cover"
+            loading="eager"
+            formats={["avif", "webp"]}
+          />
+        </div>
+      </div>
+
+      <div
+        id="post-body"
+        class="prose-content leading-relaxed text-on-surface/90"
+      >
+      </div>
+
+      <footer
+        class="mt-16 pt-8"
+        style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex-shrink-0"
+            >
+              <Picture
+                src={Profile}
+                alt="Luis Angel Gutierrez"
+                class="w-full h-full object-cover"
+                loading="lazy"
+                formats={["avif", "webp"]}
+              />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-on-surface">
+                Luis Angel Gutierrez
+              </p>
+              <p class="text-xs text-on-surface-variant">
+                Full Stack Developer
+              </p>
+            </div>
+          </div>
+
+          <a
+            href="/blog"
+            class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4 rotate-180"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+            Volver al blog
+          </a>
+        </div>
+      </footer>
+    </div>
+  </article>
+
+  <Footer slot="footer" />
+</Layout>
+
+<script define:vars={{ wpApiBase }}>
+  const loading = document.getElementById("blog-post-loading");
+  const error = document.getElementById("blog-post-error");
+  const content = document.getElementById("blog-post-content");
+
+  const stripHtml = (value) => {
+    const doc = new DOMParser().parseFromString(value ?? "", "text/html");
+    return (doc.body.textContent ?? "").trim();
+  };
+
+  const formatDate = (value) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? ""
+      : date.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+  };
+
+  const loadPost = async () => {
+    try {
+      const slug = new URLSearchParams(window.location.search).get("slug");
+      if (!slug || !wpApiBase) throw new Error("Slug o API base invalida");
+
+      const response = await fetch(
+        `${wpApiBase}/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=1`,
+      );
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+
+      const posts = await response.json();
+      const post = Array.isArray(posts) ? posts[0] : null;
+      if (!post) throw new Error("Post no encontrado");
+
+      const featuredImage =
+        post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
+      const titleText = stripHtml(post.title?.rendered ?? "Articulo");
+      const excerptText = stripHtml(post.excerpt?.rendered ?? "");
+
+      const breadcrumb = document.getElementById("post-breadcrumb");
+      const postDate = document.getElementById("post-date");
+      const postTitle = document.getElementById("post-title");
+      const postExcerpt = document.getElementById("post-excerpt");
+      const postBody = document.getElementById("post-body");
+      const imageWrapper = document.getElementById("post-image-wrapper");
+      const imageShell = document.getElementById("post-image-shell");
+
+      if (breadcrumb) breadcrumb.textContent = titleText;
+      if (postDate) postDate.textContent = formatDate(post.date);
+      if (postTitle) postTitle.textContent = titleText;
+      if (postExcerpt) postExcerpt.textContent = excerptText;
+      if (postBody) postBody.innerHTML = post.content?.rendered ?? "";
+
+      if (featuredImage && imageWrapper && imageShell) {
+        const picture = imageShell.querySelector("picture");
+        const image = picture?.querySelector("img");
+
+        picture
+          ?.querySelectorAll("source")
+          .forEach((source) => source.remove());
+
+        if (image) {
+          image.src = featuredImage;
+          image.srcset = featuredImage;
+          image.alt = titleText;
+        }
+
+        imageWrapper.classList.remove("hidden");
+      }
+
+      document.title = `${titleText} · Blog de Luis Angel Gutierrez`;
+
+      const metaDescription = document.querySelector(
+        'meta[name="description"]',
+      );
+      if (metaDescription && excerptText) {
+        metaDescription.setAttribute("content", excerptText.slice(0, 160));
+      }
+
+      loading?.classList.add("hidden");
+      content?.classList.remove("hidden");
+    } catch {
+      loading?.classList.add("hidden");
+      error?.classList.remove("hidden");
+    }
+  };
+
+  loadPost();
+</script>
+
+<style>
+  @reference '@/styles/global.css';
+
+  .prose-content :global(h2) {
+    @apply font-headline text-2xl font-semibold text-on-surface mt-10 mb-4;
+  }
+  .prose-content :global(h3) {
+    @apply font-headline text-xl font-semibold text-on-surface mt-8 mb-3;
+  }
+  .prose-content :global(p) {
+    @apply text-base text-on-surface/80 mb-5 leading-relaxed;
+  }
+  .prose-content :global(a) {
+    @apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
+  }
+  .prose-content :global(ul) {
+    @apply list-disc list-inside mb-5 space-y-1 text-on-surface/80;
+  }
+  .prose-content :global(ol) {
+    @apply list-decimal list-inside mb-5 space-y-1 text-on-surface/80;
+  }
+  .prose-content :global(blockquote) {
+    @apply border-l-4 border-primary pl-5 my-6 italic text-on-surface-variant;
+  }
+  .prose-content :global(pre) {
+    @apply font-mono text-sm bg-surface-container text-on-surface p-5 rounded-xl overflow-x-auto my-6;
+  }
+  .prose-content :global(code:not(pre code)) {
+    @apply font-mono text-sm text-primary bg-surface-container px-1.5 py-0.5 rounded;
+  }
+  .prose-content :global(img) {
+    @apply rounded-xl my-8 w-full;
+  }
+  .prose-content :global(hr) {
+    @apply my-10;
+    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
+  }
+  .prose-content :global(strong) {
+    @apply font-semibold text-on-surface;
+  }
+</style>
