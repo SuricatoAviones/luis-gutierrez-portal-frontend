@@ -104,6 +104,12 @@ const categories = Object.keys(skillsByCategory);
     acf?: { category?: string; level?: number };
   };
 
+  type NormalizedSkill = {
+    title: string;
+    category: string;
+    level: number;
+  };
+
   const section = document.getElementById('habilidades');
   const tabContainer = document.getElementById('skill-tabs');
 
@@ -147,13 +153,38 @@ const categories = Object.keys(skillsByCategory);
     });
   }
 
+  const decodeHtml = (value: unknown): string => {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    const doc = new DOMParser().parseFromString(raw, 'text/html');
+    return (doc.body.textContent ?? '').trim();
+  };
+
+  const normalizeSkill = (skill: SkillItem): NormalizedSkill | null => {
+    const title = decodeHtml(skill?.title?.rendered) || 'Habilidad';
+    const category = decodeHtml(skill?.acf?.category) || 'Otros';
+    const level = Math.max(0, Math.min(100, Number(skill?.acf?.level ?? 0)));
+
+    if (!title && !category) return null;
+
+    return { title, category, level };
+  };
+
   const renderSkills = (skills: SkillItem[]) => {
     if (!tabContainer || !section || !Array.isArray(skills) || skills.length === 0) {
       return;
     }
 
-    const grouped = skills.reduce<Record<string, SkillItem[]>>((acc, skill) => {
-      const category = skill?.acf?.category || 'Otros';
+    const normalized = skills
+      .map((skill) => normalizeSkill(skill))
+      .filter((skill): skill is NormalizedSkill => Boolean(skill));
+
+    if (normalized.length === 0) {
+      return;
+    }
+
+    const grouped = normalized.reduce<Record<string, NormalizedSkill[]>>((acc, skill) => {
+      const category = skill.category;
       if (!acc[category]) acc[category] = [];
       acc[category].push(skill);
       return acc;
@@ -185,8 +216,8 @@ const categories = Object.keys(skillsByCategory);
         `skill-panel ${i !== 0 ? 'hidden ' : ''}` +
         'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
 
-      grouped[cat].forEach((skill: SkillItem, j: number) => {
-        const level = Number(skill?.acf?.level ?? 0);
+      grouped[cat].forEach((skill: NormalizedSkill, j: number) => {
+        const level = skill.level;
 
         const card = document.createElement('div');
         card.className =
@@ -198,7 +229,7 @@ const categories = Object.keys(skillsByCategory);
 
         const title = document.createElement('span');
         title.className = 'font-body text-sm font-medium text-on-surface';
-        title.textContent = skill?.title?.rendered ?? 'Habilidad';
+        title.textContent = skill.title;
 
         const pct = document.createElement('span');
         pct.className = 'font-mono text-xs text-primary';

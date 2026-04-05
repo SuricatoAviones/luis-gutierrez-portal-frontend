@@ -237,7 +237,8 @@ const perPage = 9;
     return card;
   };
 
-  const createPagination = (count) => {
+  const createPagination = (totalItems) => {
+    const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
     paginationContainer.innerHTML = "";
 
     if (page > 1) {
@@ -251,10 +252,10 @@ const perPage = 9;
 
     const label = document.createElement("span");
     label.className = "font-mono text-sm text-on-surface-variant";
-    label.textContent = `Pagina ${page}`;
+    label.textContent = `Pagina ${Math.min(page, totalPages)} de ${totalPages}`;
     paginationContainer.appendChild(label);
 
-    if (count === perPage) {
+    if (page < totalPages) {
       const next = document.createElement("a");
       next.href = `/blog?page=${page + 1}`;
       next.className =
@@ -263,29 +264,84 @@ const perPage = 9;
       paginationContainer.appendChild(next);
     }
 
-    if (page > 1 || count === perPage) {
+    if (totalPages > 1) {
       paginationContainer.classList.remove("hidden");
+    } else {
+      paginationContainer.classList.add("hidden");
     }
+  };
+
+  const fetchAllPosts = async () => {
+    const allPosts = [];
+    const seenKeys = new Set();
+    let currentPage = 1;
+    const requestPerPage = 100;
+    const maxPages = 80;
+
+    while (currentPage <= maxPages) {
+      const response = await fetch(
+        `${wpApiBase}/wp/v2/posts?per_page=${requestPerPage}&page=${currentPage}&_embed=1`,
+      );
+
+      if (!response.ok) {
+        break;
+      }
+
+      const pagePosts = await response.json();
+      if (!Array.isArray(pagePosts) || pagePosts.length === 0) {
+        break;
+      }
+
+      let addedInPage = 0;
+      pagePosts.forEach((post) => {
+        const key = String(post?.id ?? post?.slug ?? "");
+        if (!key || seenKeys.has(key)) return;
+        seenKeys.add(key);
+        allPosts.push(post);
+        addedInPage += 1;
+      });
+
+      const totalPagesHeader = Number(
+        response.headers.get("X-WP-TotalPages") ?? "0",
+      );
+
+      if (
+        (Number.isFinite(totalPagesHeader) &&
+          totalPagesHeader > 0 &&
+          currentPage >= totalPagesHeader) ||
+        addedInPage === 0
+      ) {
+        break;
+      }
+
+      currentPage += 1;
+    }
+
+    return allPosts;
   };
 
   const loadBlog = async () => {
     try {
       if (!wpApiBase) throw new Error("WP_API_URL no configurada");
 
-      const response = await fetch(
-        `${wpApiBase}/wp/v2/posts?per_page=${perPage}&page=${page}&_embed=1`,
-      );
-      if (!response.ok) throw new Error(`Error ${response.status}`);
-
-      const posts = await response.json();
+      const allPosts = await fetchAllPosts();
       loading?.classList.add("hidden");
 
-      if (!Array.isArray(posts) || posts.length === 0) {
+      if (!Array.isArray(allPosts) || allPosts.length === 0) {
         emptyContainer?.classList.remove("hidden");
         return;
       }
 
-      const [featured, ...rest] = posts;
+      const start = (page - 1) * perPage;
+      const pagedPosts = allPosts.slice(start, start + perPage);
+
+      if (pagedPosts.length === 0) {
+        emptyContainer?.classList.remove("hidden");
+        createPagination(allPosts.length);
+        return;
+      }
+
+      const [featured, ...rest] = pagedPosts;
 
       if (featured && featuredContainer) {
         featuredContainer.innerHTML = "";
@@ -299,7 +355,7 @@ const perPage = 9;
         gridContainer.classList.remove("hidden");
       }
 
-      createPagination(posts.length);
+      createPagination(allPosts.length);
     } catch {
       loading?.classList.add("hidden");
       emptyContainer?.classList.remove("hidden");

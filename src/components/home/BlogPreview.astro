@@ -228,12 +228,16 @@ function formatPostDate(dateStr: string): string {
       const title = document.createElement("h3");
       title.className =
         "font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2";
-      title.textContent = stripHtml(post.title?.rendered ?? "Sin titulo");
+      title.textContent =
+        stripHtml(post.title?.rendered ?? "") ||
+        String(post.slug ?? "Sin titulo").replace(/-/g, " ");
 
       const excerpt = document.createElement("p");
       excerpt.className =
         "text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3";
-      excerpt.textContent = stripHtml(post.excerpt?.rendered ?? "");
+      excerpt.textContent =
+        stripHtml(post.excerpt?.rendered ?? "") ||
+        "Sin resumen disponible por el momento.";
 
       const footer = document.createElement("div");
       footer.className = "mt-4 pt-4 flex items-center justify-between";
@@ -251,16 +255,52 @@ function formatPostDate(dateStr: string): string {
       if (!apiBase) return;
 
       try {
-        const response = await fetch(
-          `${apiBase}/wp/v2/posts?per_page=3&page=1&_embed=1`,
-        );
-        if (!response.ok) return;
+        const collected = [];
+        const seenKeys = new Set();
+        let currentPage = 1;
+        const desiredCount = 3;
+        const maxPages = 30;
 
-        const posts = await response.json();
-        if (!Array.isArray(posts) || posts.length === 0) return;
+        while (collected.length < desiredCount && currentPage <= maxPages) {
+          const response = await fetch(
+            `${apiBase}/wp/v2/posts?per_page=${desiredCount}&page=${currentPage}&_embed=1`,
+          );
+          if (!response.ok) break;
+
+          const posts = await response.json();
+          if (!Array.isArray(posts) || posts.length === 0) break;
+
+          let addedInPage = 0;
+          posts.forEach((post) => {
+            const key = String(post?.id ?? post?.slug ?? "");
+            if (!key || seenKeys.has(key)) return;
+            seenKeys.add(key);
+            collected.push(post);
+            addedInPage += 1;
+          });
+
+          const totalPagesHeader = Number(
+            response.headers.get("X-WP-TotalPages") ?? "0",
+          );
+
+          if (
+            (Number.isFinite(totalPagesHeader) &&
+              totalPagesHeader > 0 &&
+              currentPage >= totalPagesHeader) ||
+            addedInPage === 0
+          ) {
+            break;
+          }
+
+          currentPage += 1;
+        }
+
+        const uniquePosts = collected.slice(0, desiredCount);
+
+        if (uniquePosts.length === 0) return;
 
         grid.innerHTML = "";
-        posts.forEach((post, index) =>
+        uniquePosts.forEach((post, index) =>
           grid.appendChild(createPostCard(post, index)),
         );
       } catch {

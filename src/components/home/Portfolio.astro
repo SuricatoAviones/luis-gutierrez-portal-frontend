@@ -259,14 +259,18 @@ let projects = fallbackProjects;
     const body = document.createElement('div');
     body.className = 'flex flex-col flex-1 p-6';
 
+    const titleText = String(project?.title?.rendered ?? '').trim() || 'Proyecto';
+
     const title = document.createElement('h3');
     title.className =
       'font-headline text-xl font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors';
-    title.textContent = project?.title?.rendered ?? 'Proyecto';
+    title.textContent = titleText;
 
     const desc = document.createElement('p');
     desc.className = 'text-sm text-on-surface-variant leading-relaxed flex-1 mb-5';
-    desc.textContent = project?.acf?.description ?? '';
+    desc.textContent =
+      String(project?.acf?.description ?? '').trim() ||
+      'Proyecto en actualización. Pronto más detalles.';
 
     const techWrap = document.createElement('div');
     techWrap.className = 'flex flex-wrap gap-2 mb-5';

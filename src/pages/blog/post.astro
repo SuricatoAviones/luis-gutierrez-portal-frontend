@@ -189,18 +189,83 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
         });
   };
 
+  const findPostBySlug = async (slug) => {
+    // Primer intento: endpoint nativo por slug
+    try {
+      const bySlugResponse = await fetch(
+        `${wpApiBase}/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=1`,
+      );
+
+      if (bySlugResponse.ok) {
+        const bySlugPosts = await bySlugResponse.json();
+        if (Array.isArray(bySlugPosts) && bySlugPosts.length > 0) {
+          const exact = bySlugPosts.find(
+            (item) => String(item?.slug ?? "") === slug,
+          );
+
+          if (exact) return exact;
+        }
+      }
+    } catch {
+      // Continua al fallback paginado
+    }
+
+    // Fallback: recorre pages hasta encontrar el slug exacto
+    const seenKeys = new Set();
+    const requestPerPage = 100;
+    const maxPages = 80;
+
+    for (let page = 1; page <= maxPages; page += 1) {
+      const response = await fetch(
+        `${wpApiBase}/wp/v2/posts?per_page=${requestPerPage}&page=${page}&_embed=1`,
+      );
+
+      if (!response.ok) {
+        break;
+      }
+
+      const pagePosts = await response.json();
+      if (!Array.isArray(pagePosts) || pagePosts.length === 0) {
+        break;
+      }
+
+      let addedInPage = 0;
+
+      for (const post of pagePosts) {
+        const key = String(post?.id ?? post?.slug ?? "");
+        if (!key || seenKeys.has(key)) continue;
+
+        seenKeys.add(key);
+        addedInPage += 1;
+
+        if (String(post?.slug ?? "") === slug) {
+          return post;
+        }
+      }
+
+      const totalPagesHeader = Number(
+        response.headers.get("X-WP-TotalPages") ?? "0",
+      );
+
+      if (
+        (Number.isFinite(totalPagesHeader) &&
+          totalPagesHeader > 0 &&
+          page >= totalPagesHeader) ||
+        addedInPage === 0
+      ) {
+        break;
+      }
+    }
+
+    return null;
+  };
+
   const loadPost = async () => {
     try {
       const slug = new URLSearchParams(window.location.search).get("slug");
       if (!slug || !wpApiBase) throw new Error("Slug o API base invalida");
 
-      const response = await fetch(
-        `${wpApiBase}/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=1`,
-      );
-      if (!response.ok) throw new Error(`Error ${response.status}`);
-
-      const posts = await response.json();
-      const post = Array.isArray(posts) ? posts[0] : null;
+      const post = await findPostBySlug(slug);
       if (!post) throw new Error("Post no encontrado");
 
       const featuredImage =

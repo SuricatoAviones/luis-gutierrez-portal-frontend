@@ -32,5 +32,14 @@ import Footer from "@/components/ui/Footer.astro";
     </div>
   </section>
 
+  <script>
+    const match = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/i);
+
+    if (match && match[1] && match[1].toLowerCase() !== "post") {
+      const slug = decodeURIComponent(match[1]);
+      window.location.replace(`/blog/post?slug=${encodeURIComponent(slug)}`);
+    }
+  </script>
+
   <Footer slot="footer" />
 </Layout>
