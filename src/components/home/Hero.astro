@@ -1,4 +1,6 @@
 ---
+import { Picture } from "astro:assets";
+import Profile from "../../assets/profile.png";
 // src/components/home/Hero.astro
 ---
 
@@ -31,7 +33,7 @@
           <span
             class="font-mono text-xs text-primary uppercase tracking-widest"
           >
-            Ingeniero de Software & Diseñador de Producto
+            Ingeniero de Sistemas & Desarrollador de Software
           </span>
         </div>
 
@@ -107,11 +109,12 @@
           <div
             class="absolute inset-8 rounded-full overflow-hidden bg-surface-container"
           >
-            <img
-              src="/profile.jpg"
+            <Picture
+              src={Profile}
               alt="Luis Gutierrez"
               class="w-full h-full object-cover"
               loading="eager"
+              formats={['avif', 'webp']}
             />
           </div>
 
