@@ -1,40 +1,8 @@
 ---
 // src/components/home/Skills.astro
-import type { Skill } from '../../lib/wordpress';
-
 const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? '/wp-json';
-const wpApiBase = wpApiBaseRaw.replace(/\/$/, '');
-
-const fallbackSkills: Record<string, Skill[]> = {
-  Frontend: [
-    { id: 1, title: { rendered: 'React' },      acf: { level: 90, category: 'Frontend', icon: '' } },
-    { id: 2, title: { rendered: 'Next.js' },    acf: { level: 85, category: 'Frontend', icon: '' } },
-    { id: 3, title: { rendered: 'TypeScript' }, acf: { level: 80, category: 'Frontend', icon: '' } },
-    { id: 4, title: { rendered: 'Tailwind CSS'},acf: { level: 95, category: 'Frontend', icon: '' } },
-    { id: 5, title: { rendered: 'Astro' },      acf: { level: 75, category: 'Frontend', icon: '' } },
-  ],
-  Backend: [
-    { id: 6, title: { rendered: 'Node.js' },    acf: { level: 85, category: 'Backend', icon: '' } },
-    { id: 7, title: { rendered: 'Express' },    acf: { level: 80, category: 'Backend', icon: '' } },
-    { id: 8, title: { rendered: 'WordPress' },  acf: { level: 90, category: 'Backend', icon: '' } },
-    { id: 9, title: { rendered: 'REST APIs' },  acf: { level: 88, category: 'Backend', icon: '' } },
-  ],
-  'Base de Datos': [
-    { id: 10, title: { rendered: 'MySQL' },     acf: { level: 80, category: 'Base de Datos', icon: '' } },
-    { id: 11, title: { rendered: 'PostgreSQL' },acf: { level: 75, category: 'Base de Datos', icon: '' } },
-    { id: 12, title: { rendered: 'MongoDB' },   acf: { level: 70, category: 'Base de Datos', icon: '' } },
-  ],
-  DevOps: [
-    { id: 13, title: { rendered: 'Git / GitHub' },acf: { level: 90, category: 'DevOps', icon: '' } },
-    { id: 14, title: { rendered: 'Docker' },      acf: { level: 70, category: 'DevOps', icon: '' } },
-    { id: 15, title: { rendered: 'Vercel' },      acf: { level: 85, category: 'DevOps', icon: '' } },
-  ],
-};
-
-let skillsByCategory = fallbackSkills;
-
-const categories = Object.keys(skillsByCategory);
+  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
+const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 ---
 
 <section
@@ -43,58 +11,30 @@ const categories = Object.keys(skillsByCategory);
   data-api-base={wpApiBase}
 >
   <div class="max-w-content mx-auto px-6 lg:px-10">
-
     <!-- Encabezado de sección -->
     <div class="flex items-center gap-4 mb-16 reveal">
-      <span class="font-mono text-2xs text-primary uppercase tracking-widest">02</span>
+      <span class="font-mono text-2xs text-primary uppercase tracking-widest"
+        >02</span
+      >
       <span class="block w-8 h-px bg-primary"></span>
-      <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Habilidades</h2>
+      <h2
+        class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface"
+      >
+        Habilidades
+      </h2>
     </div>
 
     <!-- Tabs de categorías -->
-    <div class="flex flex-wrap gap-2 mb-12 reveal" id="skill-tabs">
-      {categories.map((cat, i) => (
-        <button
-          data-category={cat}
-          class={`skill-tab px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-            i === 0
-              ? 'bg-secondary-container text-on-secondary-container'
-              : 'bg-surface-high text-on-surface-variant hover:bg-surface-highest hover:text-on-surface'
-          }`}
-        >
-          {cat}
-        </button>
-      ))}
-    </div>
+    <div class="flex flex-wrap gap-2 mb-12 reveal" id="skill-tabs"></div>
 
-    <!-- Grillas de skills por categoría -->
-    {categories.map((cat, i) => (
-      <div
-        data-panel={cat}
-        class={`skill-panel ${i !== 0 ? 'hidden' : ''} grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`}
-      >
-        {skillsByCategory[cat].map((skill, j) => (
-          <div
-            class="reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border"
-            style={`animation-delay: ${j * 60}ms`}
-          >
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-body text-sm font-medium text-on-surface">
-                {skill.title.rendered}
-              </span>
-              <span class="font-mono text-xs text-primary">{skill.acf.level}%</span>
-            </div>
-            <!-- Barra de nivel -->
-            <div class="h-1 bg-outline-variant/20 rounded-full overflow-hidden">
-              <div
-                class="skill-bar h-full bg-primary rounded-full origin-left scale-x-0 transition-transform duration-700"
-                style={`--level: ${skill.acf.level / 100}; transition-timing-function: var(--ease-expo);`}
-              ></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    ))}
+    <p
+      id="skills-feedback"
+      class="hidden mb-8 rounded-xl border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
+      aria-live="polite"
+    >
+    </p>
+
+    <div id="skills-panels"></div>
   </div>
 </section>
 
@@ -110,26 +50,59 @@ const categories = Object.keys(skillsByCategory);
     level: number;
   };
 
-  const section = document.getElementById('habilidades');
-  const tabContainer = document.getElementById('skill-tabs');
+  const section = document.getElementById("habilidades");
+  const tabContainer = document.getElementById("skill-tabs");
+  const panelContainer = document.getElementById("skills-panels");
+  const feedback = document.getElementById("skills-feedback");
+
+  const setFeedback = (message: string, isError = false) => {
+    if (!feedback) return;
+
+    feedback.textContent = message;
+    feedback.classList.remove("hidden");
+
+    if (isError) {
+      feedback.style.borderColor =
+        "color-mix(in srgb, var(--error) 35%, transparent)";
+      feedback.style.color = "var(--error)";
+      return;
+    }
+
+    feedback.style.borderColor = "";
+    feedback.style.color = "";
+  };
+
+  const clearFeedback = () => {
+    if (!feedback) return;
+    feedback.classList.add("hidden");
+    feedback.textContent = "";
+    feedback.style.borderColor = "";
+    feedback.style.color = "";
+  };
 
   const bindTabs = () => {
-    const tabs = document.querySelectorAll<HTMLButtonElement>('.skill-tab');
-    const panels = document.querySelectorAll<HTMLDivElement>('.skill-panel');
+    const tabs = document.querySelectorAll<HTMLButtonElement>(".skill-tab");
+    const panels = document.querySelectorAll<HTMLDivElement>(".skill-panel");
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
+      tab.addEventListener("click", () => {
         const cat = tab.dataset.category;
 
         tabs.forEach((t) => {
-          t.classList.remove('bg-secondary-container', 'text-on-secondary-container');
-          t.classList.add('bg-surface-high', 'text-on-surface-variant');
+          t.classList.remove(
+            "bg-secondary-container",
+            "text-on-secondary-container",
+          );
+          t.classList.add("bg-surface-high", "text-on-surface-variant");
         });
-        tab.classList.add('bg-secondary-container', 'text-on-secondary-container');
-        tab.classList.remove('bg-surface-high', 'text-on-surface-variant');
+        tab.classList.add(
+          "bg-secondary-container",
+          "text-on-secondary-container",
+        );
+        tab.classList.remove("bg-surface-high", "text-on-surface-variant");
 
         panels.forEach((panel) => {
-          panel.classList.toggle('hidden', panel.dataset.panel !== cat);
+          panel.classList.toggle("hidden", panel.dataset.panel !== cat);
         });
 
         animateBars();
@@ -138,31 +111,33 @@ const categories = Object.keys(skillsByCategory);
   };
 
   function animateBars() {
-    document.querySelectorAll<HTMLDivElement>('.skill-bar:not([data-animated])').forEach((bar) => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const level = bar.style.getPropertyValue('--level');
-            bar.style.transform = `scaleX(${level})`;
-            bar.dataset.animated = 'true';
-            observer.unobserve(bar);
-          }
+    document
+      .querySelectorAll<HTMLDivElement>(".skill-bar:not([data-animated])")
+      .forEach((bar) => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const level = bar.style.getPropertyValue("--level");
+              bar.style.transform = `scaleX(${level})`;
+              bar.dataset.animated = "true";
+              observer.unobserve(bar);
+            }
+          });
         });
+        observer.observe(bar);
       });
-      observer.observe(bar);
-    });
   }
 
   const decodeHtml = (value: unknown): string => {
-    const raw = String(value ?? '').trim();
-    if (!raw) return '';
-    const doc = new DOMParser().parseFromString(raw, 'text/html');
-    return (doc.body.textContent ?? '').trim();
+    const raw = String(value ?? "").trim();
+    if (!raw) return "";
+    const doc = new DOMParser().parseFromString(raw, "text/html");
+    return (doc.body.textContent ?? "").trim();
   };
 
   const normalizeSkill = (skill: SkillItem): NormalizedSkill | null => {
-    const title = decodeHtml(skill?.title?.rendered) || 'Habilidad';
-    const category = decodeHtml(skill?.acf?.category) || 'Otros';
+    const title = decodeHtml(skill?.title?.rendered) || "Habilidad";
+    const category = decodeHtml(skill?.acf?.category) || "Otros";
     const level = Math.max(0, Math.min(100, Number(skill?.acf?.level ?? 0)));
 
     if (!title && !category) return null;
@@ -170,108 +145,141 @@ const categories = Object.keys(skillsByCategory);
     return { title, category, level };
   };
 
-  const renderSkills = (skills: SkillItem[]) => {
-    if (!tabContainer || !section || !Array.isArray(skills) || skills.length === 0) {
-      return;
+  const renderSkills = (skills: SkillItem[]): boolean => {
+    if (
+      !tabContainer ||
+      !panelContainer ||
+      !Array.isArray(skills) ||
+      skills.length === 0
+    ) {
+      return false;
     }
 
     const normalized = skills
       .map((skill) => normalizeSkill(skill))
       .filter((skill): skill is NormalizedSkill => Boolean(skill));
 
-    if (normalized.length === 0) {
-      return;
-    }
+    if (normalized.length === 0) return false;
 
-    const grouped = normalized.reduce<Record<string, NormalizedSkill[]>>((acc, skill) => {
-      const category = skill.category;
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(skill);
-      return acc;
-    }, {});
+    const grouped = normalized.reduce<Record<string, NormalizedSkill[]>>(
+      (acc, skill) => {
+        const category = skill.category;
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(skill);
+        return acc;
+      },
+      {},
+    );
 
     const categories = Object.keys(grouped);
-    if (categories.length === 0) return;
+    if (categories.length === 0) return false;
 
-    tabContainer.innerHTML = '';
+    tabContainer.innerHTML = "";
+    panelContainer.innerHTML = "";
 
     categories.forEach((cat, i) => {
-      const tab = document.createElement('button');
+      const tab = document.createElement("button");
       tab.dataset.category = cat;
       tab.className =
-        'skill-tab px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ' +
+        "skill-tab px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 " +
         (i === 0
-          ? 'bg-secondary-container text-on-secondary-container'
-          : 'bg-surface-high text-on-surface-variant hover:bg-surface-highest hover:text-on-surface');
+          ? "bg-secondary-container text-on-secondary-container"
+          : "bg-surface-high text-on-surface-variant hover:bg-surface-highest hover:text-on-surface");
       tab.textContent = cat;
       tabContainer.appendChild(tab);
     });
 
-    section.querySelectorAll<HTMLDivElement>('.skill-panel').forEach((panel) => panel.remove());
-
     categories.forEach((cat, i) => {
-      const panel = document.createElement('div');
+      const panel = document.createElement("div");
       panel.dataset.panel = cat;
       panel.className =
-        `skill-panel ${i !== 0 ? 'hidden ' : ''}` +
-        'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+        `skill-panel ${i !== 0 ? "hidden " : ""}` +
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4";
 
       grouped[cat].forEach((skill: NormalizedSkill, j: number) => {
         const level = skill.level;
 
-        const card = document.createElement('div');
+        const card = document.createElement("div");
         card.className =
-          'reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border';
+          "reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border";
         card.style.animationDelay = `${j * 60}ms`;
 
-        const header = document.createElement('div');
-        header.className = 'flex items-center justify-between mb-3';
+        const header = document.createElement("div");
+        header.className = "flex items-center justify-between mb-3";
 
-        const title = document.createElement('span');
-        title.className = 'font-body text-sm font-medium text-on-surface';
+        const title = document.createElement("span");
+        title.className = "font-body text-sm font-medium text-on-surface";
         title.textContent = skill.title;
 
-        const pct = document.createElement('span');
-        pct.className = 'font-mono text-xs text-primary';
+        const pct = document.createElement("span");
+        pct.className = "font-mono text-xs text-primary";
         pct.textContent = `${level}%`;
 
         header.append(title, pct);
 
-        const barWrap = document.createElement('div');
-        barWrap.className = 'h-1 bg-outline-variant/20 rounded-full overflow-hidden';
+        const barWrap = document.createElement("div");
+        barWrap.className =
+          "h-1 bg-outline-variant/20 rounded-full overflow-hidden";
 
-        const bar = document.createElement('div');
+        const bar = document.createElement("div");
         bar.className =
-          'skill-bar h-full bg-primary rounded-full origin-left scale-x-0 transition-transform duration-700';
-        bar.style.setProperty('--level', String(Math.max(0, Math.min(100, level)) / 100));
-        bar.style.setProperty('transition-timing-function', 'var(--ease-expo)');
+          "skill-bar h-full bg-primary rounded-full origin-left scale-x-0 transition-transform duration-700";
+        bar.style.setProperty(
+          "--level",
+          String(Math.max(0, Math.min(100, level)) / 100),
+        );
+        bar.style.setProperty("transition-timing-function", "var(--ease-expo)");
         barWrap.appendChild(bar);
 
         card.append(header, barWrap);
         panel.appendChild(card);
       });
 
-      section.querySelector('.max-w-content')?.appendChild(panel);
+      panelContainer.appendChild(panel);
     });
 
     bindTabs();
     animateBars();
+    return true;
   };
 
   const loadSkills = async () => {
-    const apiBase = section?.getAttribute('data-api-base')?.replace(/\/$/, '');
-    if (!apiBase) return;
+    const apiBase = section?.getAttribute("data-api-base")?.replace(/\/$/, "");
+    if (!apiBase) {
+      setFeedback(
+        "No se pudo obtener la configuracion de la API para habilidades.",
+        true,
+      );
+      return;
+    }
 
     try {
       const response = await fetch(
         `${apiBase}/wp/v2/skill?per_page=100&_fields=id,title,acf`,
       );
-      if (!response.ok) return;
+      if (!response.ok) {
+        setFeedback(
+          "Hubo un fallo cargando las habilidades desde la API.",
+          true,
+        );
+        return;
+      }
 
       const skills = (await response.json()) as SkillItem[];
-      renderSkills(skills);
+      if (!Array.isArray(skills) || skills.length === 0) {
+        setFeedback("No hay habilidades disponibles en este momento.");
+        return;
+      }
+
+      const rendered = renderSkills(skills);
+      if (!rendered) {
+        setFeedback("No hay habilidades disponibles en este momento.");
+        return;
+      }
+
+      clearFeedback();
     } catch {
-      // Mantiene fallback estatico si hay error de API/CORS.
+      setFeedback("Hubo un fallo cargando las habilidades desde la API.", true);
     }
   };
 

@@ -17,53 +17,7 @@ type ExperienceItem = {
 const wpApiBaseRaw =
   import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? '/wp-json';
 const wpApiBase = wpApiBaseRaw.replace(/\/$/, '');
-
-const fallbackExperiences: ExperienceItem[] = [
-  {
-    id: 1,
-    title: { rendered: 'Senior Software Engineer' },
-    acf: {
-      company: 'TechInnovate',
-      position: 'Senior Software Engineer',
-      start_date: '2022-03',
-      end_date: 'presente',
-      description:
-        'Lideré el desarrollo de una plataforma SaaS con más de 10,000 usuarios activos. Arquitecté el backend en Node.js y el frontend en React, mejorando el tiempo de carga en un 40%.',
-      technologies: 'React, Node.js, TypeScript, PostgreSQL, Redis, AWS',
-      company_url: 'https://empresa.com',
-    },
-  },
-  {
-    id: 2,
-    title: { rendered: 'Full-Stack Developer' },
-    acf: {
-      company: 'Creative Minds',
-      position: 'Full-Stack Developer',
-      start_date: '2020-06',
-      end_date: '2022-02',
-      description:
-        'Desarrollé interfaces para más de 15 clientes. Implementé design systems con Storybook y migré proyectos legacy a React con mejoras significativas de rendimiento.',
-      technologies: 'React, Vue.js, SASS, Webpack, Figma',
-      company_url: '#',
-    },
-  },
-  {
-    id: 3,
-    title: { rendered: 'WordPress Developer' },
-    acf: {
-      company: 'Freelance',
-      position: 'WordPress Developer',
-      start_date: '2019-01',
-      end_date: '2020-05',
-      description:
-        'Creé sitios web y tiendas en línea con WordPress y WooCommerce. Desarrollo de plugins personalizados y temas a medida.',
-      technologies: 'WordPress, PHP, ACF, WooCommerce, CSS',
-      company_url: '',
-    },
-  },
-];
-
-const experiences = fallbackExperiences;
+const experiences: ExperienceItem[] = [];
 
 const formatDate = (dateStr: string): string => {
   if (!dateStr) return '';
@@ -176,6 +130,12 @@ const parseTechs = (techString: string): string[] =>
           );
         })}
       </div>
+
+      <p
+        id="experience-feedback"
+        class="hidden mt-6 rounded-xl border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
+        aria-live="polite"
+      ></p>
     </div>
   </div>
 </section>
@@ -209,6 +169,32 @@ const parseTechs = (techString: string): string[] =>
 
   const experienceSection = document.getElementById('experiencia');
   const timeline = document.getElementById('experience-timeline');
+  const experienceFeedback = document.getElementById('experience-feedback');
+
+  const setFeedback = (message: string, isError = false) => {
+    if (!experienceFeedback) return;
+
+    experienceFeedback.textContent = message;
+    experienceFeedback.classList.remove('hidden');
+
+    if (isError) {
+      experienceFeedback.style.borderColor =
+        'color-mix(in srgb, var(--error) 35%, transparent)';
+      experienceFeedback.style.color = 'var(--error)';
+      return;
+    }
+
+    experienceFeedback.style.borderColor = '';
+    experienceFeedback.style.color = '';
+  };
+
+  const clearFeedback = () => {
+    if (!experienceFeedback) return;
+    experienceFeedback.classList.add('hidden');
+    experienceFeedback.textContent = '';
+    experienceFeedback.style.borderColor = '';
+    experienceFeedback.style.color = '';
+  };
 
   const decodeHtml = (value: unknown): string => {
     const raw = String(value ?? '').trim();
@@ -376,29 +362,49 @@ const parseTechs = (techString: string): string[] =>
 
   const loadExperiences = async () => {
     const apiBase = experienceSection?.getAttribute('data-api-base')?.replace(/\/$/, '');
-    if (!apiBase || !timeline) return;
+    if (!timeline) return;
+
+    if (!apiBase) {
+      setFeedback('No se pudo obtener la configuracion de la API para experiencia.', true);
+      return;
+    }
 
     try {
       const response = await fetch(
         `${apiBase}/wp/v2/experience?per_page=100&_fields=id,title,acf&orderby=date&order=desc`,
       );
-      if (!response.ok) return;
+      if (!response.ok) {
+        timeline.innerHTML = '';
+        setFeedback('Hubo un fallo cargando la experiencia desde la API.', true);
+        return;
+      }
 
       const data = (await response.json()) as ExperiencePayload[];
-      if (!Array.isArray(data) || data.length === 0) return;
+      if (!Array.isArray(data) || data.length === 0) {
+        timeline.innerHTML = '';
+        setFeedback('No hay experiencias disponibles en este momento.');
+        return;
+      }
 
       const normalized = data
         .map((item) => normalizeExperience(item))
         .filter((item): item is NormalizedExperience => Boolean(item));
 
-      if (normalized.length === 0) return;
+      if (normalized.length === 0) {
+        timeline.innerHTML = '';
+        setFeedback('No hay experiencias disponibles en este momento.');
+        return;
+      }
 
       timeline.innerHTML = '';
       normalized.forEach((exp, index) => {
         timeline.appendChild(createExperienceNode(exp, index));
       });
+
+      clearFeedback();
     } catch {
-      // Mantiene fallback estatico si hay error de API/CORS.
+      timeline.innerHTML = '';
+      setFeedback('Hubo un fallo cargando la experiencia desde la API.', true);
     }
   };
 

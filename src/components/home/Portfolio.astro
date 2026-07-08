@@ -6,63 +6,7 @@ import type { Project } from '../../lib/wordpress';
 const wpApiBaseRaw =
   import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? '/wp-json';
 const wpApiBase = wpApiBaseRaw.replace(/\/$/, '');
-
-const fallbackProjects: Project[] = [
-  {
-    id: 1,
-    title: { rendered: 'Nexus Core' },
-    acf: {
-      project_url: '#',
-      github_url: '#',
-      description: 'Plataforma SaaS de gestión empresarial con arquitectura de microservicios y panel de analíticas en tiempo real.',
-      technologies: 'Next.js, TypeScript, Stripe, PostgreSQL',
-      featured_image: '',
-      year: '2024',
-      category: 'Full Stack',
-    },
-  },
-  {
-    id: 2,
-    title: { rendered: 'Editorial Framework' },
-    acf: {
-      project_url: '#',
-      github_url: '#',
-      description: 'Sistema de publicación editorial con CMS headless, tipografía dinámica y soporte multi-idioma.',
-      technologies: 'Astro, WordPress API, Tailwind, ACF',
-      featured_image: '',
-      year: '2024',
-      category: 'Frontend',
-    },
-  },
-  {
-    id: 3,
-    title: { rendered: 'API REST para Fintech' },
-    acf: {
-      project_url: '#',
-      github_url: '#',
-      description: 'API robusta para gestión de transacciones financieras con autenticación JWT y control de roles.',
-      technologies: 'Node.js, Express, MySQL, Redis',
-      featured_image: '',
-      year: '2023',
-      category: 'Backend',
-    },
-  },
-  {
-    id: 4,
-    title: { rendered: 'Dashboard de Analíticas' },
-    acf: {
-      project_url: '#',
-      github_url: '#',
-      description: 'Dashboard interactivo con métricas en tiempo real y visualizaciones de datos avanzadas.',
-      technologies: 'React, D3.js, Node.js, WebSockets',
-      featured_image: '',
-      year: '2023',
-      category: 'Full Stack',
-    },
-  },
-];
-
-let projects = fallbackProjects;
+const projects: Project[] = [];
 ---
 
 <section id="portafolio" class="py-24 lg:py-32">
@@ -171,6 +115,12 @@ let projects = fallbackProjects;
         );
       })}
     </div>
+
+    <p
+      id="portfolio-feedback"
+      class="hidden mt-8 rounded-xl border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
+      aria-live="polite"
+    ></p>
   </div>
 </section>
 
@@ -189,6 +139,32 @@ let projects = fallbackProjects;
   };
 
   const portfolioGrid = document.getElementById('portfolio-grid');
+  const portfolioFeedback = document.getElementById('portfolio-feedback');
+
+  const setFeedback = (message: string, isError = false) => {
+    if (!portfolioFeedback) return;
+
+    portfolioFeedback.textContent = message;
+    portfolioFeedback.classList.remove('hidden');
+
+    if (isError) {
+      portfolioFeedback.style.borderColor =
+        'color-mix(in srgb, var(--error) 35%, transparent)';
+      portfolioFeedback.style.color = 'var(--error)';
+      return;
+    }
+
+    portfolioFeedback.style.borderColor = '';
+    portfolioFeedback.style.color = '';
+  };
+
+  const clearFeedback = () => {
+    if (!portfolioFeedback) return;
+    portfolioFeedback.classList.add('hidden');
+    portfolioFeedback.textContent = '';
+    portfolioFeedback.style.borderColor = '';
+    portfolioFeedback.style.color = '';
+  };
 
   const splitTechs = (value: unknown): string[] =>
     String(value ?? '')
@@ -316,23 +292,39 @@ let projects = fallbackProjects;
 
   const loadProjects = async () => {
     const apiBase = portfolioGrid?.getAttribute('data-api-base')?.replace(/\/$/, '');
-    if (!portfolioGrid || !apiBase) return;
+    if (!portfolioGrid) return;
+
+    if (!apiBase) {
+      setFeedback('No se pudo obtener la configuracion de la API para proyectos.', true);
+      return;
+    }
 
     try {
       const response = await fetch(
         `${apiBase}/wp/v2/portfolio?per_page=100&_fields=id,title,acf&acf_format=standard`,
       );
-      if (!response.ok) return;
+      if (!response.ok) {
+        portfolioGrid.innerHTML = '';
+        setFeedback('Hubo un fallo cargando los proyectos desde la API.', true);
+        return;
+      }
 
       const projects = (await response.json()) as ProjectItem[];
-      if (!Array.isArray(projects) || projects.length === 0) return;
+      if (!Array.isArray(projects) || projects.length === 0) {
+        portfolioGrid.innerHTML = '';
+        setFeedback('No hay proyectos disponibles en este momento.');
+        return;
+      }
 
       portfolioGrid.innerHTML = '';
       projects.forEach((project: ProjectItem, i: number) => {
         portfolioGrid.appendChild(createProjectCard(project, i));
       });
+
+      clearFeedback();
     } catch {
-      // Mantiene fallback estatico si hay error de API/CORS.
+      portfolioGrid.innerHTML = '';
+      setFeedback('Hubo un fallo cargando los proyectos desde la API.', true);
     }
   };
 
