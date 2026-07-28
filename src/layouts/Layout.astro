@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css";
+import Profile from "@/assets/profile.png";
 import { buildMetaDescription } from "@/lib/seo";
 
 interface Props {
@@ -16,7 +17,7 @@ const defaultDescription =
 const {
   title = "Luis Gutierrez — Ingeniero de Software",
   description = defaultDescription,
-  image = "/og-image.png",
+  image = Profile.src,
   robots = "index,follow",
   ogType = "website",
 } = Astro.props;
@@ -25,6 +26,7 @@ const canonicalURL = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url;
 const metaDescription = buildMetaDescription(description, defaultDescription);
+const socialImageURL = new URL(image, canonicalURL).href;
 ---
 
 <!doctype html>
@@ -35,21 +37,24 @@ const metaDescription = buildMetaDescription(description, defaultDescription);
     <meta name="description" content={metaDescription} />
     <meta name="author" content="Luis Gutierrez" />
     <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#fdfcfb" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
-    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:url" content={canonicalURL.href} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={metaDescription} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:alt" content={title} />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={metaDescription} />
-    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image" content={socialImageURL} />
 
-    <link rel="canonical" href={canonicalURL} />
+    <link rel="canonical" href={canonicalURL.href} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!-- Google Fonts: Newsreader + Manrope + JetBrains Mono -->
@@ -76,9 +81,12 @@ const metaDescription = buildMetaDescription(description, defaultDescription);
   <body
     class="font-body bg-surface text-on-surface antialiased transition-colors duration-300"
   >
+    <a class="skip-link" href="#contenido-principal"
+      >Saltar al contenido principal</a
+    >
     <slot name="nav" />
 
-    <main>
+    <main id="contenido-principal" tabindex="-1">
       <slot />
     </main>
 
@@ -97,7 +105,7 @@ const metaDescription = buildMetaDescription(description, defaultDescription);
         { threshold: 0.1, rootMargin: "0px 0px -60px 0px" },
       );
 
-      const observeRevealElements = (root) => {
+      const observeRevealElements = (root: Element | Document) => {
         if (!(root instanceof Element || root instanceof Document)) return;
 
         if (root instanceof Element && root.classList.contains("reveal")) {

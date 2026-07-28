@@ -6,7 +6,7 @@ import NavBar from "@/components/ui/NavBar.astro";
 import Footer from "@/components/ui/Footer.astro";
 import Profile from "@/assets/profile.png";
 import {
-  getPosts,
+  getAllPosts,
   getPostBySlug,
   getFeaturedImage,
   stripHtml,
@@ -23,7 +23,7 @@ export async function getStaticPaths() {
   ];
 
   try {
-    const posts = await getPosts(100);
+    const posts = await getAllPosts();
     if (posts.length > 0) {
       return posts.map((post) => ({ params: { slug: post.slug } }));
     }
@@ -121,20 +121,12 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
     <!-- Imagen destacada -->
     {
       featuredImage && (
-        <div
-          id="slug-featured-image"
-          data-src={featuredImage}
-          data-alt={stripHtml(post.title.rendered)}
-          class="mb-12 rounded-xl overflow-hidden aspect-video"
-        >
-          <Picture
-            src={Profile}
-            alt={stripHtml(post.title.rendered)}
-            class="w-full h-full object-cover"
-            loading="eager"
-            formats={["avif", "webp"]}
-          />
-        </div>
+        <img
+          src={featuredImage}
+          alt={postTitle}
+          class="mb-12 rounded-xl aspect-video w-full object-cover"
+          loading="eager"
+        />
       )
     }
 
@@ -199,24 +191,6 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
 
   <Footer slot="footer" />
 </Layout>
-
-<script>
-  const featuredWrapper = document.getElementById("slug-featured-image");
-
-  if (featuredWrapper) {
-    const remoteSrc = featuredWrapper.getAttribute("data-src");
-    const remoteAlt = featuredWrapper.getAttribute("data-alt") ?? "";
-    const picture = featuredWrapper.querySelector("picture");
-    const image = picture?.querySelector("img");
-
-    if (remoteSrc && image) {
-      picture?.querySelectorAll("source").forEach((source) => source.remove());
-      image.src = remoteSrc;
-      image.srcset = remoteSrc;
-      image.alt = remoteAlt;
-    }
-  }
-</script>
 
 <style>
   @reference "@/styles/global.css";

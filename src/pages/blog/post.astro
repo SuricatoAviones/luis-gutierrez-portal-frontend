@@ -168,7 +168,7 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
   <Footer slot="footer" />
 </Layout>
 
-<script define:vars={{ wpApiBase }}>
+<script is:inline define:vars={{ wpApiBase }}>
   const loading = document.getElementById("blog-post-loading");
   const error = document.getElementById("blog-post-error");
   const content = document.getElementById("blog-post-content");

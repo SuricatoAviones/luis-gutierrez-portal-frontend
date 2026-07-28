@@ -1,0 +1,216 @@
+---
+import { getFeaturedImage, stripHtml, type WPPost } from "@/lib/wordpress";
+
+interface Props {
+  posts: WPPost[];
+  currentPage: number;
+  totalPages: number;
+}
+
+const { posts, currentPage, totalPages } = Astro.props;
+const [featuredPost, ...otherPosts] = posts;
+
+const formatDate = (value: string) => {
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? ""
+    : new Intl.DateTimeFormat("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+};
+
+const getPostTitle = (post: WPPost) =>
+  stripHtml(post.title?.rendered ?? "") || "Artículo";
+
+const getPostExcerpt = (post: WPPost) =>
+  stripHtml(post.excerpt?.rendered ?? "");
+
+const getPostUrl = (post: WPPost) => `/blog/${encodeURIComponent(post.slug)}`;
+
+const getPageUrl = (page: number) =>
+  page === 1 ? "/blog" : `/blog/page/${page}`;
+---
+
+<div class="max-w-content mx-auto px-6 lg:px-10 py-16">
+  {
+    featuredPost ? (
+      <>
+        <a
+          href={getPostUrl(featuredPost)}
+          class="group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ghost-border"
+        >
+          <div class="relative aspect-video lg:aspect-auto bg-surface-container overflow-hidden">
+            {getFeaturedImage(featuredPost) ? (
+              <img
+                src={getFeaturedImage(featuredPost)}
+                alt={getPostTitle(featuredPost)}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="eager"
+              />
+            ) : (
+              <div
+                class="w-full h-full flex items-center justify-center"
+                aria-hidden="true"
+              >
+                <span class="font-headline text-7xl font-bold text-primary/20">
+                  {getPostTitle(featuredPost).charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+            <span class="absolute top-4 left-4 font-mono text-2xs uppercase tracking-wider bg-primary text-on-primary px-3 py-1 rounded-full">
+              Destacado
+            </span>
+          </div>
+
+          <div class="p-8 lg:p-10 flex flex-col justify-center">
+            <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-4">
+              {formatDate(featuredPost.date)}
+            </p>
+            <h2 class="font-headline text-2xl lg:text-3xl font-semibold text-on-surface leading-snug mb-4 group-hover:text-primary transition-colors">
+              {getPostTitle(featuredPost)}
+            </h2>
+            <p class="text-on-surface-variant leading-relaxed line-clamp-3 mb-6">
+              {getPostExcerpt(featuredPost) ||
+                "Sin resumen disponible por el momento."}
+            </p>
+            <span class="inline-flex items-center gap-2 text-sm font-medium text-primary">
+              Leer artículo
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        {otherPosts.length > 0 && (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
+            {otherPosts.map((post, index) => {
+              const title = getPostTitle(post);
+              const excerpt = getPostExcerpt(post);
+              const image = getFeaturedImage(post);
+
+              return (
+                <a
+                  href={getPostUrl(post)}
+                  class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
+                  style={`animation-delay: ${index * 100}ms`}
+                >
+                  <div class="relative aspect-video bg-surface-container overflow-hidden">
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={title}
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div
+                        class="w-full h-full flex items-center justify-center"
+                        aria-hidden="true"
+                      >
+                        <span class="font-headline text-4xl font-bold text-primary/20">
+                          {title.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="flex flex-col flex-1 p-5">
+                    <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3">
+                      {formatDate(post.date)}
+                    </p>
+                    <h3 class="font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                      {title}
+                    </h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
+                      {excerpt || "Sin resumen disponible por el momento."}
+                    </p>
+                    <div
+                      class="mt-4 pt-4 flex items-center justify-between"
+                      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+                    >
+                      <span class="text-xs font-medium text-primary">
+                        Leer artículo
+                      </span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <nav
+            class="mt-16 flex items-center justify-center gap-4"
+            aria-label="Paginación del blog"
+          >
+            {currentPage > 1 && (
+              <a
+                href={getPageUrl(currentPage - 1)}
+                rel="prev"
+                class="px-5 py-2 text-sm text-on-surface-variant hover:text-on-surface rounded-full transition-colors ghost-border"
+              >
+                <span aria-hidden="true">← </span>Anterior
+              </a>
+            )}
+            <span
+              class="font-mono text-sm text-on-surface-variant"
+              aria-current="page"
+            >
+              Página {currentPage} de {totalPages}
+            </span>
+            {currentPage < totalPages && (
+              <a
+                href={getPageUrl(currentPage + 1)}
+                rel="next"
+                class="px-5 py-2 text-sm text-on-surface-variant hover:text-on-surface rounded-full transition-colors ghost-border"
+              >
+                Siguiente<span aria-hidden="true"> →</span>
+              </a>
+            )}
+          </nav>
+        )}
+      </>
+    ) : (
+      <div class="text-center py-20">
+        <p class="font-headline text-2xl text-on-surface-variant">
+          Próximamente...
+        </p>
+        <p class="text-sm text-on-surface-variant mt-2">
+          Aún no hay artículos disponibles.
+        </p>
+      </div>
+    )
+  }
+</div>

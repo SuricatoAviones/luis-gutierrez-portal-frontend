@@ -9,6 +9,12 @@ const navLinks = [
 ];
 
 const currentPath = Astro.url.pathname;
+const normalizedPath =
+  currentPath === "/" ? "/" : currentPath.replace(/\/$/, "");
+const isCurrentPage = (href: string) => {
+  const [path, hash] = href.split("#");
+  return !hash && normalizedPath === path;
+};
 ---
 
 <header
@@ -16,11 +22,13 @@ const currentPath = Astro.url.pathname;
   class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
 >
   <nav
+    aria-label="Navegación principal"
     class="max-w-content mx-auto px-6 lg:px-10 flex items-center justify-between h-18"
   >
     <!-- Logo -->
     <a
       href="/"
+      aria-label="Ir a la página de inicio"
       class="font-headline text-xl font-semibold tracking-tight text-on-surface hover:text-primary transition-colors duration-200"
     >
       LG<span class="text-primary">.</span>
@@ -33,10 +41,9 @@ const currentPath = Astro.url.pathname;
           <li>
             <a
               href={href}
-              class={`font-body text-sm font-medium transition-colors duration-200
-              ${
-                currentPath === href ||
-                (href !== "/" && currentPath.startsWith(href.split("#")[0]))
+              aria-current={isCurrentPage(href) ? "page" : undefined}
+              class={`font-body text-sm font-medium transition-colors duration-200 ${
+                isCurrentPage(href)
                   ? "text-primary"
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
@@ -54,6 +61,9 @@ const currentPath = Astro.url.pathname;
       <button
         id="theme-toggle"
         aria-label="Cambiar tema"
+        aria-pressed="false"
+        title="Cambiar tema"
+        type="button"
         class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-high transition-all duration-200"
       >
         <!-- Sun icon (shown in dark mode) -->
@@ -100,6 +110,10 @@ const currentPath = Astro.url.pathname;
       <button
         id="menu-toggle"
         aria-label="Abrir menú"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        title="Abrir menú"
+        type="button"
         class="md:hidden flex flex-col gap-1.5 p-2"
       >
         <span
@@ -116,14 +130,16 @@ const currentPath = Astro.url.pathname;
   </nav>
 
   <!-- Menú mobile -->
-  <div
+  <nav
     id="mobile-menu"
+    aria-label="Navegación móvil"
     class="md:hidden hidden flex-col bg-surface-container px-6 pb-6 pt-4 gap-4"
   >
     {
       navLinks.map(({ href, label }) => (
         <a
           href={href}
+          aria-current={isCurrentPage(href) ? "page" : undefined}
           class="font-body text-base font-medium text-on-surface-variant hover:text-on-surface transition-colors py-1"
         >
           {label}
@@ -136,7 +152,7 @@ const currentPath = Astro.url.pathname;
     >
       Hablemos
     </a>
-  </div>
+  </nav>
 </header>
 
 <!-- Offset para el navbar fijo -->
@@ -168,6 +184,11 @@ const currentPath = Astro.url.pathname;
     document
       .querySelectorAll(".light-icon")
       .forEach((el) => el.classList.toggle("hidden", isDark));
+    toggle?.setAttribute("aria-pressed", String(isDark));
+    toggle?.setAttribute(
+      "aria-label",
+      isDark ? "Activar tema claro" : "Activar tema oscuro",
+    );
   }
 
   updateIcons();
@@ -196,10 +217,12 @@ const currentPath = Astro.url.pathname;
   const lines = document.querySelectorAll(".menu-line");
   let open = false;
 
-  menuBtn?.addEventListener("click", () => {
-    open = !open;
+  const setMenuState = (nextOpen: boolean) => {
+    open = nextOpen;
     menu?.classList.toggle("hidden", !open);
     menu?.classList.toggle("flex", open);
+    menuBtn?.setAttribute("aria-expanded", String(open));
+    menuBtn?.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
     if (open) {
       lines[0]?.classList.add("rotate-45", "translate-y-[0.375rem]");
       lines[1]?.classList.add("opacity-0");
@@ -209,13 +232,22 @@ const currentPath = Astro.url.pathname;
       lines[1]?.classList.remove("opacity-0");
       lines[2]?.classList.remove("-rotate-45", "-translate-y-[0.375rem]");
     }
+  };
+
+  menuBtn?.addEventListener("click", () => {
+    setMenuState(!open);
   });
 
   menu?.querySelectorAll("a").forEach((a) => {
     a.addEventListener("click", () => {
-      open = false;
-      menu.classList.add("hidden");
-      menu.classList.remove("flex");
+      setMenuState(false);
     });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && open) {
+      setMenuState(false);
+      menuBtn?.focus();
+    }
   });
 </script>

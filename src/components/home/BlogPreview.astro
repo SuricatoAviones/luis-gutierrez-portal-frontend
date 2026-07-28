@@ -1,8 +1,24 @@
 ---
-// src/components/home/BlogPreview.astro
-const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
-const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
+import {
+  getFeaturedImage,
+  getLatestPosts,
+  stripHtml,
+  type WPPost,
+} from "@/lib/wordpress";
+
+const posts = await getLatestPosts(3).catch(() => [] as WPPost[]);
+
+const formatDate = (value: string) => {
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? ""
+    : new Intl.DateTimeFormat("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+};
 ---
 
 <section id="blog" class="py-24 lg:py-32 bg-surface-container">
@@ -16,7 +32,7 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
         <h2
           class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface"
         >
-          Pensamiento Tecnico
+          Pensamiento Técnico
         </h2>
       </div>
       <a
@@ -31,6 +47,7 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
           viewBox="0 0 24 24"
           stroke-width="2"
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path
             stroke-linecap="round"
@@ -40,223 +57,105 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
       </a>
     </div>
 
-    <div
-      id="home-blog-preview-grid"
-      class="grid grid-cols-1 md:grid-cols-3 gap-6"
-      data-api-base={wpApiBase}
-    >
-    </div>
+    {
+      posts.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {posts.map((post, index) => {
+            const title = stripHtml(post.title.rendered) || "Artículo";
+            const excerpt = stripHtml(post.excerpt.rendered);
+            const image = getFeaturedImage(post);
 
-    <p
-      id="home-blog-preview-feedback"
-      class="hidden mt-8 rounded-xl border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
-      aria-live="polite"
-    >
-    </p>
+            return (
+              <a
+                href={`/blog/${encodeURIComponent(post.slug)}`}
+                class="reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border"
+                style={`animation-delay: ${index * 100}ms`}
+              >
+                <div class="relative aspect-video bg-surface-container overflow-hidden">
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={title}
+                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      class="w-full h-full flex items-center justify-center text-primary/30"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-10 h-10"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                  <span class="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
+                </div>
+
+                <div class="flex flex-col flex-1 p-5">
+                  <p class="font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3">
+                    {formatDate(post.date)}
+                  </p>
+                  <h3 class="font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                    {title}
+                  </h3>
+                  <p class="text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3">
+                    {excerpt || "Sin resumen disponible por el momento."}
+                  </p>
+                  <div
+                    class="mt-4 pt-4 flex items-center justify-between"
+                    style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+                  >
+                    <span class="text-xs font-medium text-primary">
+                      Leer artículo
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant">
+          No hay artículos disponibles en este momento.
+        </p>
+      )
+    }
 
     <div class="mt-10 text-center sm:hidden reveal">
       <a
         href="/blog"
         class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
       >
-        Ver todos los articulos ->
+        Ver todos los artículos
+        <span aria-hidden="true">→</span>
       </a>
     </div>
   </div>
 </section>
-
-<script>
-  // @ts-nocheck
-  const grid = document.getElementById("home-blog-preview-grid");
-  const feedback = document.getElementById("home-blog-preview-feedback");
-
-  if (grid) {
-    const apiBase = grid.getAttribute("data-api-base")?.replace(/\/$/, "");
-
-    const setFeedback = (message, isError = false) => {
-      if (!feedback) return;
-
-      feedback.textContent = message;
-      feedback.classList.remove("hidden");
-
-      if (isError) {
-        feedback.style.borderColor =
-          "color-mix(in srgb, var(--error) 35%, transparent)";
-        feedback.style.color = "var(--error)";
-        return;
-      }
-
-      feedback.style.borderColor = "";
-      feedback.style.color = "";
-    };
-
-    const clearFeedback = () => {
-      if (!feedback) return;
-      feedback.classList.add("hidden");
-      feedback.textContent = "";
-      feedback.style.borderColor = "";
-      feedback.style.color = "";
-    };
-
-    const stripHtml = (value) => {
-      const doc = new DOMParser().parseFromString(value ?? "", "text/html");
-      return (doc.body.textContent ?? "").trim();
-    };
-
-    const formatDate = (value) => {
-      const date = new Date(value);
-      return Number.isNaN(date.getTime())
-        ? ""
-        : date.toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-    };
-
-    const getFeaturedImage = (post) =>
-      post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
-
-    const createPostCard = (post, index) => {
-      const card = document.createElement("a");
-      card.href = `/blog/post?slug=${encodeURIComponent(post.slug)}`;
-      card.className =
-        "reveal group flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest hover:-translate-y-1 transition-all duration-300 ghost-border";
-      card.style.animationDelay = `${index * 100}ms`;
-
-      const imageWrapper = document.createElement("div");
-      imageWrapper.className =
-        "relative aspect-video bg-surface-container overflow-hidden";
-
-      const imageUrl = getFeaturedImage(post);
-      if (imageUrl) {
-        const image = document.createElement("img");
-        image.src = imageUrl;
-        image.alt = stripHtml(post.title?.rendered ?? "Post");
-        image.className =
-          "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105";
-        image.loading = "lazy";
-        imageWrapper.appendChild(image);
-      } else {
-        const imageFallback = document.createElement("div");
-        imageFallback.className =
-          "w-full h-full flex items-center justify-center";
-        imageFallback.innerHTML =
-          '<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primary/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>';
-        imageWrapper.appendChild(imageFallback);
-      }
-
-      const trim = document.createElement("div");
-      trim.className =
-        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-container";
-      imageWrapper.appendChild(trim);
-
-      const body = document.createElement("div");
-      body.className = "flex flex-col flex-1 p-5";
-
-      const date = document.createElement("p");
-      date.className =
-        "font-mono text-2xs text-on-surface-variant uppercase tracking-wider mb-3";
-      date.textContent = formatDate(post.date);
-
-      const title = document.createElement("h3");
-      title.className =
-        "font-headline text-lg font-semibold text-on-surface leading-snug mb-3 group-hover:text-primary transition-colors line-clamp-2";
-      title.textContent =
-        stripHtml(post.title?.rendered ?? "") ||
-        String(post.slug ?? "Sin titulo").replace(/-/g, " ");
-
-      const excerpt = document.createElement("p");
-      excerpt.className =
-        "text-sm text-on-surface-variant leading-relaxed flex-1 line-clamp-3";
-      excerpt.textContent =
-        stripHtml(post.excerpt?.rendered ?? "") ||
-        "Sin resumen disponible por el momento.";
-
-      const footer = document.createElement("div");
-      footer.className = "mt-4 pt-4 flex items-center justify-between";
-      footer.style.borderTop =
-        "1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent)";
-      footer.innerHTML =
-        '<span class="text-xs font-medium text-primary">Leer articulo</span><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>';
-
-      body.append(date, title, excerpt, footer);
-      card.append(imageWrapper, body);
-      return card;
-    };
-
-    const loadPosts = async () => {
-      if (!apiBase) {
-        setFeedback(
-          "No se pudo obtener la configuracion de la API para el blog.",
-          true,
-        );
-        return;
-      }
-
-      try {
-        const collected = [];
-        const seenKeys = new Set();
-        let currentPage = 1;
-        const desiredCount = 3;
-        const maxPages = 30;
-
-        while (collected.length < desiredCount && currentPage <= maxPages) {
-          const response = await fetch(
-            `${apiBase}/wp/v2/posts?per_page=${desiredCount}&page=${currentPage}&_embed=1`,
-          );
-          if (!response.ok) {
-            throw new Error("Error al consultar posts");
-          }
-
-          const posts = await response.json();
-          if (!Array.isArray(posts) || posts.length === 0) break;
-
-          let addedInPage = 0;
-          posts.forEach((post) => {
-            const key = String(post?.id ?? post?.slug ?? "");
-            if (!key || seenKeys.has(key)) return;
-            seenKeys.add(key);
-            collected.push(post);
-            addedInPage += 1;
-          });
-
-          const totalPagesHeader = Number(
-            response.headers.get("X-WP-TotalPages") ?? "0",
-          );
-
-          if (
-            (Number.isFinite(totalPagesHeader) &&
-              totalPagesHeader > 0 &&
-              currentPage >= totalPagesHeader) ||
-            addedInPage === 0
-          ) {
-            break;
-          }
-
-          currentPage += 1;
-        }
-
-        const uniquePosts = collected.slice(0, desiredCount);
-
-        if (uniquePosts.length === 0) {
-          grid.innerHTML = "";
-          setFeedback("No hay articulos disponibles en este momento.");
-          return;
-        }
-
-        grid.innerHTML = "";
-        uniquePosts.forEach((post, index) =>
-          grid.appendChild(createPostCard(post, index)),
-        );
-
-        clearFeedback();
-      } catch {
-        grid.innerHTML = "";
-        setFeedback("Hubo un fallo cargando los articulos desde la API.", true);
-      }
-    };
-
-    loadPosts();
-  }
-</script>

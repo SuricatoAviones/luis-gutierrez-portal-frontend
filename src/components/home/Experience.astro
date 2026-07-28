@@ -1,412 +1,150 @@
 ---
-// src/components/home/Experience.astro
-type ExperienceItem = {
-  id: number;
-  title: { rendered: string };
-  acf: {
-    company: string;
-    position: string;
-    start_date: string;
-    end_date: string;
-    description: string;
-    technologies: string;
-    company_url: string;
-  };
-};
+import {
+  formatDate,
+  getExperiences,
+  parseTechs,
+  stripHtml,
+  type Experience,
+  type ExperienceFields,
+} from "@/lib/wordpress";
 
-const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? '/wp-json';
-const wpApiBase = wpApiBaseRaw.replace(/\/$/, '');
-const experiences: ExperienceItem[] = [];
-
-const formatDate = (dateStr: string): string => {
-  if (!dateStr) return '';
-  if (dateStr.toLowerCase() === 'presente') return 'Presente';
-  const [year, month] = dateStr.split('-');
-  const d = new Date(Number(year), Number(month) - 1);
-  return d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
-};
-
-const parseTechs = (techString: string): string[] =>
-  String(techString ?? '')
-    .split(',')
-    .map((tech) => tech.trim())
-    .filter(Boolean);
+const experiences: Experience[] = await getExperiences().catch(() => []);
 ---
 
-<section
-  id="experiencia"
-  class="py-24 lg:py-32"
-  data-api-base={wpApiBase}
->
+<section id="experiencia" class="py-24 lg:py-32">
   <div class="max-w-content mx-auto px-6 lg:px-10">
-
-    <!-- Encabezado de sección -->
     <div class="flex items-center gap-4 mb-16 reveal">
-      <span class="font-mono text-2xs text-primary uppercase tracking-widest">04</span>
+      <span class="font-mono text-2xs text-primary uppercase tracking-widest"
+        >04</span
+      >
       <span class="block w-8 h-px bg-primary"></span>
-      <h2 class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface">Trayectoria Profesional</h2>
+      <h2
+        class="font-headline text-3xl lg:text-4xl font-semibold text-on-surface"
+      >
+        Trayectoria Profesional
+      </h2>
     </div>
 
-    <!-- Timeline -->
-    <div class="relative">
-      <div class="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-outline-variant/30 to-transparent" aria-hidden="true"></div>
+    {
+      experiences.length > 0 ? (
+        <div class="relative">
+          <div
+            class="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-outline-variant/30 to-transparent"
+            aria-hidden="true"
+          />
 
-      <div id="experience-timeline" class="space-y-12">
-        {experiences.map((exp, i) => {
-          const techs = parseTechs(exp.acf.technologies);
-          const isCurrent = exp.acf.end_date.toLowerCase() === 'presente';
-          const startStr = formatDate(exp.acf.start_date);
-          const endStr = isCurrent ? 'Presente' : formatDate(exp.acf.end_date);
+          <ol class="space-y-12">
+            {experiences.map((experience, index) => {
+              const title = stripHtml(experience.title?.rendered ?? "");
+              const acf: ExperienceFields = experience.acf ?? {};
+              const position =
+                acf.position?.trim() || title || "Rol en actualización";
+              const company = acf.company?.trim() || "Empresa";
+              const endDate = acf.end_date?.trim() || "presente";
+              const isCurrent = endDate.toLowerCase() === "presente";
+              const start = formatDate(acf.start_date ?? "") || "Inicio";
+              const end = isCurrent
+                ? "Presente"
+                : formatDate(endDate) || "Actualidad";
+              const technologies = parseTechs(acf.technologies ?? "");
+              const companyUrl = acf.company_url?.trim();
 
-          return (
-            <div class="relative pl-14 sm:pl-20 reveal" style={`animation-delay: ${i * 100}ms`}>
-              <!-- Punto en la línea -->
-              <div class="absolute left-0 sm:left-2 top-1.5 flex items-center justify-center">
-                <div class={`w-5 h-5 rounded-full flex items-center justify-center
-                  ${isCurrent
-                    ? 'bg-primary'
-                    : 'bg-surface-container'
-                  }`}
-                  style={isCurrent ? '' : `border: 2px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);`}
+              return (
+                <li
+                  class="relative pl-14 sm:pl-20 reveal"
+                  style={`animation-delay: ${index * 100}ms`}
                 >
-                  {isCurrent && (
-                    <div class="w-2 h-2 rounded-full bg-on-primary"></div>
-                  )}
-                </div>
-              </div>
-
-              <!-- Tarjeta de experiencia -->
-              <div class="bg-surface-low rounded-xl p-6 ghost-border hover:bg-surface-highest transition-all duration-300">
-                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-                  <div>
-                    <h3 class="font-headline text-lg font-semibold text-on-surface">
-                      {exp.acf.position || exp.title.rendered}
-                    </h3>
-                    <div class="flex items-center gap-2 mt-1">
-                      {exp.acf.company_url && exp.acf.company_url !== '#' && exp.acf.company_url !== '' ? (
-                        <a
-                          href={exp.acf.company_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-sm font-medium text-primary hover:underline"
-                        >
-                          {exp.acf.company}
-                        </a>
-                      ) : (
-                        <span class="text-sm font-medium text-primary">{exp.acf.company}</span>
+                  <div
+                    class="absolute left-0 sm:left-2 top-1.5 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <div
+                      class={`w-5 h-5 rounded-full flex items-center justify-center ${
+                        isCurrent ? "bg-primary" : "bg-surface-container"
+                      }`}
+                      style={
+                        isCurrent
+                          ? undefined
+                          : "border: 2px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);"
+                      }
+                    >
+                      {isCurrent && (
+                        <div class="w-2 h-2 rounded-full bg-on-primary" />
                       )}
                     </div>
                   </div>
 
-                  <div class="flex-shrink-0 text-right">
-                    <span class={`inline-flex items-center font-mono text-2xs px-3 py-1 rounded-full uppercase tracking-wider ${
-                      isCurrent
-                        ? 'bg-primary-container text-on-primary-container'
-                        : 'bg-surface-high text-on-surface-variant'
-                    }`}>
-                      {isCurrent && <span class="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>}
-                      {startStr} — {endStr}
-                    </span>
-                  </div>
-                </div>
+                  <article class="bg-surface-low rounded-xl p-6 ghost-border hover:bg-surface-highest transition-all duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+                      <div>
+                        <h3 class="font-headline text-lg font-semibold text-on-surface">
+                          {position}
+                        </h3>
+                        <div class="flex items-center gap-2 mt-1">
+                          {companyUrl && companyUrl !== "#" ? (
+                            <a
+                              href={companyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="text-sm font-medium text-primary hover:underline"
+                            >
+                              {company}
+                            </a>
+                          ) : (
+                            <span class="text-sm font-medium text-primary">
+                              {company}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                <p class="text-sm text-on-surface-variant leading-relaxed mb-4">
-                  {exp.acf.description || 'Experiencia en actualización. Pronto más detalles.'}
-                </p>
+                      <div class="flex-shrink-0 text-right">
+                        <span
+                          class={`inline-flex items-center font-mono text-2xs px-3 py-1 rounded-full uppercase tracking-wider ${
+                            isCurrent
+                              ? "bg-primary-container text-on-primary-container"
+                              : "bg-surface-high text-on-surface-variant"
+                          }`}
+                        >
+                          {isCurrent && (
+                            <span
+                              class="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse"
+                              aria-hidden="true"
+                            />
+                          )}
+                          {start} — {end}
+                        </span>
+                      </div>
+                    </div>
 
-                {techs.length > 0 && (
-                  <div class="flex flex-wrap gap-2 pt-4"
-                       style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);">
-                    {techs.map((tech) => (
-                      <span class="font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                    <p class="text-sm text-on-surface-variant leading-relaxed mb-4">
+                      {acf.description?.trim() ||
+                        "Experiencia en actualización. Pronto más detalles."}
+                    </p>
 
-      <p
-        id="experience-feedback"
-        class="hidden mt-6 rounded-xl border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
-        aria-live="polite"
-      ></p>
-    </div>
+                    {technologies.length > 0 && (
+                      <div
+                        class="flex flex-wrap gap-2 pt-4"
+                        style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+                      >
+                        {technologies.map((technology) => (
+                          <span class="font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full">
+                            {technology}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ) : (
+        <p class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant">
+          No hay experiencias disponibles en este momento.
+        </p>
+      )
+    }
   </div>
 </section>
-
-<script>
-  type ExperiencePayload = {
-    id?: number;
-    title?: { rendered?: string };
-    acf?: {
-      company?: string;
-      position?: string;
-      start_date?: string;
-      end_date?: string;
-      description?: string;
-      technologies?: string;
-      company_url?: string;
-    };
-  };
-
-  type NormalizedExperience = {
-    id: string;
-    title: string;
-    company: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-    technologies: string[];
-    companyUrl: string;
-  };
-
-  const experienceSection = document.getElementById('experiencia');
-  const timeline = document.getElementById('experience-timeline');
-  const experienceFeedback = document.getElementById('experience-feedback');
-
-  const setFeedback = (message: string, isError = false) => {
-    if (!experienceFeedback) return;
-
-    experienceFeedback.textContent = message;
-    experienceFeedback.classList.remove('hidden');
-
-    if (isError) {
-      experienceFeedback.style.borderColor =
-        'color-mix(in srgb, var(--error) 35%, transparent)';
-      experienceFeedback.style.color = 'var(--error)';
-      return;
-    }
-
-    experienceFeedback.style.borderColor = '';
-    experienceFeedback.style.color = '';
-  };
-
-  const clearFeedback = () => {
-    if (!experienceFeedback) return;
-    experienceFeedback.classList.add('hidden');
-    experienceFeedback.textContent = '';
-    experienceFeedback.style.borderColor = '';
-    experienceFeedback.style.color = '';
-  };
-
-  const decodeHtml = (value: unknown): string => {
-    const raw = String(value ?? '').trim();
-    if (!raw) return '';
-    const doc = new DOMParser().parseFromString(raw, 'text/html');
-    return (doc.body.textContent ?? '').trim();
-  };
-
-  const splitTechs = (value: unknown): string[] =>
-    String(value ?? '')
-      .split(',')
-      .map((tech) => tech.trim())
-      .filter(Boolean);
-
-  const formatDateRangePart = (value: string): string => {
-    const clean = String(value ?? '').trim();
-    if (!clean) return '';
-    if (clean.toLowerCase() === 'presente') return 'Presente';
-
-    const [year, month] = clean.split('-');
-    const d = new Date(Number(year), Number(month) - 1);
-    if (Number.isNaN(d.getTime())) return clean;
-
-    return d.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
-  };
-
-  const normalizeExperience = (item: ExperiencePayload): NormalizedExperience | null => {
-    const id = String(item?.id ?? '').trim();
-    const title = decodeHtml(item?.title?.rendered);
-    const position = decodeHtml(item?.acf?.position) || title;
-    const company = decodeHtml(item?.acf?.company) || 'Empresa';
-    const startDate = String(item?.acf?.start_date ?? '').trim();
-    const endDate = String(item?.acf?.end_date ?? '').trim() || 'presente';
-    const description =
-      decodeHtml(item?.acf?.description) ||
-      'Experiencia en actualización. Pronto más detalles.';
-    const technologies = splitTechs(item?.acf?.technologies);
-    const companyUrl = String(item?.acf?.company_url ?? '').trim();
-
-    if (!id && !position && !company) return null;
-
-    return {
-      id: id || `${position}-${company}`,
-      title,
-      company,
-      position: position || 'Rol en actualización',
-      startDate,
-      endDate,
-      description,
-      technologies,
-      companyUrl,
-    };
-  };
-
-  const createExperienceNode = (exp: NormalizedExperience, index: number): HTMLDivElement => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'relative pl-14 sm:pl-20 reveal';
-    wrapper.style.animationDelay = `${index * 100}ms`;
-
-    const isCurrent = exp.endDate.toLowerCase() === 'presente';
-    const startStr = formatDateRangePart(exp.startDate);
-    const endStr = isCurrent ? 'Presente' : formatDateRangePart(exp.endDate);
-
-    const dotWrap = document.createElement('div');
-    dotWrap.className = 'absolute left-0 sm:left-2 top-1.5 flex items-center justify-center';
-
-    const dot = document.createElement('div');
-    dot.className = `w-5 h-5 rounded-full flex items-center justify-center ${
-      isCurrent ? 'bg-primary' : 'bg-surface-container'
-    }`;
-    if (!isCurrent) {
-      dot.style.border =
-        '2px solid color-mix(in srgb, var(--outline-variant) 40%, transparent)';
-    }
-
-    if (isCurrent) {
-      const inner = document.createElement('div');
-      inner.className = 'w-2 h-2 rounded-full bg-on-primary';
-      dot.appendChild(inner);
-    }
-
-    dotWrap.appendChild(dot);
-
-    const card = document.createElement('div');
-    card.className =
-      'bg-surface-low rounded-xl p-6 ghost-border hover:bg-surface-highest transition-all duration-300';
-
-    const header = document.createElement('div');
-    header.className =
-      'flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4';
-
-    const left = document.createElement('div');
-    const role = document.createElement('h3');
-    role.className = 'font-headline text-lg font-semibold text-on-surface';
-    role.textContent = exp.position;
-
-    const companyWrap = document.createElement('div');
-    companyWrap.className = 'flex items-center gap-2 mt-1';
-
-    if (exp.companyUrl && exp.companyUrl !== '#') {
-      const companyLink = document.createElement('a');
-      companyLink.href = exp.companyUrl;
-      companyLink.target = '_blank';
-      companyLink.rel = 'noopener noreferrer';
-      companyLink.className = 'text-sm font-medium text-primary hover:underline';
-      companyLink.textContent = exp.company;
-      companyWrap.appendChild(companyLink);
-    } else {
-      const companyText = document.createElement('span');
-      companyText.className = 'text-sm font-medium text-primary';
-      companyText.textContent = exp.company;
-      companyWrap.appendChild(companyText);
-    }
-
-    left.append(role, companyWrap);
-
-    const right = document.createElement('div');
-    right.className = 'flex-shrink-0 text-right';
-
-    const dateBadge = document.createElement('span');
-    dateBadge.className =
-      `inline-flex items-center font-mono text-2xs px-3 py-1 rounded-full uppercase tracking-wider ${
-        isCurrent
-          ? 'bg-primary-container text-on-primary-container'
-          : 'bg-surface-high text-on-surface-variant'
-      }`;
-
-    if (isCurrent) {
-      const pulse = document.createElement('span');
-      pulse.className = 'mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse';
-      dateBadge.appendChild(pulse);
-    }
-
-    dateBadge.append(`${startStr || 'Inicio'} — ${endStr || 'Actualidad'}`);
-    right.appendChild(dateBadge);
-
-    header.append(left, right);
-
-    const description = document.createElement('p');
-    description.className = 'text-sm text-on-surface-variant leading-relaxed mb-4';
-    description.textContent = exp.description;
-
-    card.append(header, description);
-
-    if (exp.technologies.length > 0) {
-      const techWrap = document.createElement('div');
-      techWrap.className = 'flex flex-wrap gap-2 pt-4';
-      techWrap.style.borderTop =
-        '1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent)';
-
-      exp.technologies.forEach((tech) => {
-        const chip = document.createElement('span');
-        chip.className =
-          'font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full';
-        chip.textContent = tech;
-        techWrap.appendChild(chip);
-      });
-
-      card.appendChild(techWrap);
-    }
-
-    wrapper.append(dotWrap, card);
-    return wrapper;
-  };
-
-  const loadExperiences = async () => {
-    const apiBase = experienceSection?.getAttribute('data-api-base')?.replace(/\/$/, '');
-    if (!timeline) return;
-
-    if (!apiBase) {
-      setFeedback('No se pudo obtener la configuracion de la API para experiencia.', true);
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${apiBase}/wp/v2/experience?per_page=100&_fields=id,title,acf&orderby=date&order=desc`,
-      );
-      if (!response.ok) {
-        timeline.innerHTML = '';
-        setFeedback('Hubo un fallo cargando la experiencia desde la API.', true);
-        return;
-      }
-
-      const data = (await response.json()) as ExperiencePayload[];
-      if (!Array.isArray(data) || data.length === 0) {
-        timeline.innerHTML = '';
-        setFeedback('No hay experiencias disponibles en este momento.');
-        return;
-      }
-
-      const normalized = data
-        .map((item) => normalizeExperience(item))
-        .filter((item): item is NormalizedExperience => Boolean(item));
-
-      if (normalized.length === 0) {
-        timeline.innerHTML = '';
-        setFeedback('No hay experiencias disponibles en este momento.');
-        return;
-      }
-
-      timeline.innerHTML = '';
-      normalized.forEach((exp, index) => {
-        timeline.appendChild(createExperienceNode(exp, index));
-      });
-
-      clearFeedback();
-    } catch {
-      timeline.innerHTML = '';
-      setFeedback('Hubo un fallo cargando la experiencia desde la API.', true);
-    }
-  };
-
-  loadExperiences();
-</script>

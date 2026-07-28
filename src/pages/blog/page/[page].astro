@@ -5,14 +5,37 @@ import Footer from "@/components/ui/Footer.astro";
 import Layout from "@/layouts/Layout.astro";
 import { getAllPosts, type WPPost } from "@/lib/wordpress";
 
-const postsPerPage = 9;
-const allPosts: WPPost[] = await getAllPosts().catch(() => []);
-const posts = allPosts.slice(0, postsPerPage);
-const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
+interface PageProps {
+  posts: WPPost[];
+  currentPage: number;
+  totalPages: number;
+}
+
+export async function getStaticPaths() {
+  const postsPerPage = 9;
+  const allPosts: WPPost[] = await getAllPosts().catch(() => []);
+  const totalPages = Math.ceil(allPosts.length / postsPerPage);
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const currentPage = index + 2;
+    const firstPost = (currentPage - 1) * postsPerPage;
+
+    return {
+      params: { page: String(currentPage) },
+      props: {
+        posts: allPosts.slice(firstPost, firstPost + postsPerPage),
+        currentPage,
+        totalPages,
+      } satisfies PageProps,
+    };
+  });
+}
+
+const { posts, currentPage, totalPages } = Astro.props as PageProps;
 ---
 
 <Layout
-  title="Blog · Luis Angel Gutierrez"
+  title={`Página ${currentPage} · Blog de Luis Angel Gutierrez`}
   description="Blog de Luis Angel Gutierrez con artículos sobre desarrollo full stack, arquitectura web, JavaScript, React, Node.js y buenas prácticas de software."
 >
   <NavBar slot="nav" />
@@ -42,7 +65,7 @@ const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
     </div>
   </section>
 
-  <BlogList posts={posts} currentPage={1} totalPages={totalPages} />
+  <BlogList posts={posts} currentPage={currentPage} totalPages={totalPages} />
 
   <Footer slot="footer" />
 </Layout>
