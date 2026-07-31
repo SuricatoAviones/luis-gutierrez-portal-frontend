@@ -40,14 +40,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
-          cat <<EOF | lftp "$FTP_HOST" -p 21
+          cat <<EOF | lftp -d "$FTP_HOST" -p 21
           user "$FTP_USER" "$FTP_PASS"
           set ftp:ssl-allow yes
+          set ftp:ssl-protect-data no
           set ssl:verify-certificate no
           set ftp:fix-pasv-address on
           set ftp:passive-mode on
           set net:timeout 60
-          set net:max-retries 3
+          set net:max-retries 2
           set net:reconnect-interval-base 5
           mirror -R --delete --parallel=4 --verbose ./dist/ "$FTP_DIR"
           quit
