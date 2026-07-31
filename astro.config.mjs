@@ -16,4 +16,12 @@ export default defineConfig({
   },
   output: 'static',
   site: 'https://luisangelgutierrez.com',
+  image: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.luisangelgutierrez.com',
+      },
+    ],
+  },
 });

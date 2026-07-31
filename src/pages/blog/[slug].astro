@@ -13,6 +13,7 @@ import {
 } from "@/lib/wordpress";
 import { buildMetaDescription } from "@/lib/seo";
 
+
 // Necesario en output: 'static' — genera una página por cada post en el build
 export async function getStaticPaths() {
   // Slugs de fallback — deben coincidir con los de BlogPreview.astro
@@ -121,11 +122,14 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
     <!-- Imagen destacada -->
     {
       featuredImage && (
-        <img
+        <Picture
           src={featuredImage}
           alt={postTitle}
           class="mb-12 rounded-xl aspect-video w-full object-cover"
           loading="eager"
+          formats={['avif', 'webp']}
+          inferSize={true}
+
         />
       )
     }

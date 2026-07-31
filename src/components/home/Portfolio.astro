@@ -6,6 +6,7 @@ import {
   type Project,
   type ProjectFields,
 } from "@/lib/wordpress";
+import { Picture } from "astro:assets";
 
 const projects: Project[] = await getProjects().catch(() => []);
 ---
@@ -28,7 +29,10 @@ const projects: Project[] = await getProjects().catch(() => []);
 
     {
       projects.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-6"
+          data-portfolio
+        >
           {projects.map((project, index) => {
             const title =
               stripHtml(project.title?.rendered ?? "") || "Proyecto";
@@ -41,16 +45,19 @@ const projects: Project[] = await getProjects().catch(() => []);
 
             return (
               <article
+                data-project
                 class="reveal group relative flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest transition-all duration-300 hover:-translate-y-1 ghost-border"
                 style={`animation-delay: ${(index % 2) * 100}ms`}
               >
                 <div class="relative w-full aspect-video bg-surface-container overflow-hidden">
                   {acf.featured_image ? (
-                    <img
+                    <Picture
                       src={acf.featured_image}
                       alt={title}
                       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                      formats={['avif', 'webp']}
+                      inferSize={true}
                     />
                   ) : (
                     <div
@@ -148,6 +155,67 @@ const projects: Project[] = await getProjects().catch(() => []);
             );
           })}
         </div>
+
+        <div
+          class="flex items-center justify-center gap-3 mt-12"
+          data-pagination
+          hidden
+        >
+          <button
+            type="button"
+            data-pagination-prev
+            class="flex items-center gap-1.5 font-mono text-sm px-3.5 py-2 rounded-lg border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:border-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            aria-label="Proyectos anteriores"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5L8.25 12l7.5-7.5"
+              />
+            </svg>
+            Anterior
+          </button>
+
+          <div
+            class="flex items-center gap-2"
+            data-pagination-pages
+            role="group"
+            aria-label="Paginación de proyectos"
+          ></div>
+
+          <button
+            type="button"
+            data-pagination-next
+            class="flex items-center gap-1.5 font-mono text-sm px-3.5 py-2 rounded-lg border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:border-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            aria-label="Proyectos siguientes"
+          >
+            Siguiente
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.25 4.5l7.5 7.5-7.5 7.5"
+              />
+            </svg>
+          </button>
+        </div>
       ) : (
         <p class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant">
           No hay proyectos disponibles en este momento.
@@ -156,3 +224,76 @@ const projects: Project[] = await getProjects().catch(() => []);
     }
   </div>
 </section>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-portfolio]");
+
+  if (root) {
+    const perPage = 2;
+    const projects = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-project]"),
+    );
+    const pagination = root.querySelector<HTMLElement>("[data-pagination]");
+    const pagesContainer =
+      root.querySelector<HTMLElement>("[data-pagination-pages]");
+    const prevButton =
+      root.querySelector<HTMLButtonElement>("[data-pagination-prev]");
+    const nextButton =
+      root.querySelector<HTMLButtonElement>("[data-pagination-next]");
+
+    if (pagination && projects.length > perPage) {
+      const totalPages = Math.ceil(projects.length / perPage);
+      let currentPage = 1;
+
+      const pageButtons: HTMLButtonElement[] = [];
+
+      for (let page = 1; page <= totalPages; page++) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = String(page);
+        button.setAttribute("aria-label", `Ir a la página ${page}`);
+        button.className =
+          "font-mono text-sm w-10 h-10 rounded-lg border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:border-primary transition-colors";
+        button.addEventListener("click", () => selectPage(page));
+        pagesContainer?.appendChild(button);
+        pageButtons.push(button);
+      }
+
+      const render = () => {
+        projects.forEach((project, index) => {
+          project.hidden = Math.floor(index / perPage) + 1 !== currentPage;
+        });
+
+        prevButton?.toggleAttribute("disabled", currentPage === 1);
+        nextButton?.toggleAttribute("disabled", currentPage === totalPages);
+
+        pageButtons.forEach((button, index) => {
+          const selected = index + 1 === currentPage;
+          button.classList.toggle("bg-primary", selected);
+          button.classList.toggle("text-on-primary", selected);
+          button.classList.toggle("border-primary", selected);
+          button.classList.toggle("text-on-surface-variant", !selected);
+          button.classList.toggle("hover:text-on-surface", !selected);
+          button.classList.toggle("hover:border-primary", !selected);
+          if (selected) {
+            button.setAttribute("aria-current", "page");
+          } else {
+            button.removeAttribute("aria-current");
+          }
+        });
+      };
+
+      function selectPage(page: number) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        render();
+      }
+
+      prevButton?.addEventListener("click", () => selectPage(currentPage - 1));
+      nextButton?.addEventListener("click", () => selectPage(currentPage + 1));
+
+      pagination.hidden = false;
+      render();
+    }
+  }
+</script>
