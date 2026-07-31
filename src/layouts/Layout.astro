@@ -86,13 +86,23 @@ const socialImageURL = new URL(image, canonicalURL).href;
     >
     <slot name="nav" />
 
-    <main id="contenido-principal" tabindex="-1">
+    <main id="contenido-principal">
       <slot />
     </main>
 
     <slot name="footer" />
 
     <script>
+      const skipLink = document.querySelector(".skip-link");
+      const mainContent = document.getElementById("contenido-principal");
+
+      skipLink?.addEventListener("click", (event) => {
+        event.preventDefault();
+        mainContent?.setAttribute("tabindex", "-1");
+        mainContent?.focus({ preventScroll: true });
+        mainContent?.scrollIntoView();
+      });
+
       const revealObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {

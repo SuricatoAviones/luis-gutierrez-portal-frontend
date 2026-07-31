@@ -31,15 +31,12 @@ jobs:
         env:
           WP_API_URL: ${{ secrets.WORDPRESS_API_URL }}
 
-      - name: Deploy to cPanel via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+      - name: Deploy to cPanel via SSH (rsync)
+        uses: SamKirkland/web-deploy@v1
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          protocol: ftp
-          port: 21
-          timeout: 120000
-          security: loose
+          target-server: ${{ secrets.SSH_SERVER }}
+          remote-user: ${{ secrets.SSH_USERNAME }}
+          private-ssh-key: ${{ secrets.SSH_KEY }}
+          destination-path: ${{ secrets.SSH_DESTINATION_PATH }}
+          source-path: ./dist/
+          ssh-port: 22
