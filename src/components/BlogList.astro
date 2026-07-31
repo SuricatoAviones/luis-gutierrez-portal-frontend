@@ -115,11 +115,13 @@ const getPageUrl = (page: number) =>
                 >
                   <div class="relative aspect-video bg-surface-container overflow-hidden">
                     {image ? (
-                      <img
+                      <Picture
                         src={image}
                         alt={title}
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
+                        formats={['avif', 'webp']}
+                        inferSize={true}
                       />
                     ) : (
                       <div
