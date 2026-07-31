@@ -23,16 +23,13 @@ jobs:
       - name: Enable corepack
         run: corepack enable
 
-      - name: Configure pnpm
-        run: pnpm config set ignore-build-scripts false
-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-build-scripts=false
+        run: pnpm install --frozen-lockfile
 
       - name: Build Astro
         run: pnpm run build
         env:
-          WORDPRESS_API_URL: ${{ secrets.WORDPRESS_API_URL }}
+          WP_API_URL: ${{ secrets.WORDPRESS_API_URL }}
 
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
