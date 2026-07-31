@@ -41,3 +41,5 @@ jobs:
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           protocol: ftps
           port: 21
+          timeout: 120000
+          security: loose
