@@ -9,6 +9,13 @@ import {
 import { Picture } from "astro:assets";
 
 const projects: Project[] = await getProjects().catch(() => []);
+
+const projectYear = (project: Project): number => {
+  const years = (project.acf?.year ?? "").match(/\d{4}/g) ?? [];
+  return years.length ? Math.max(...years.map(Number)) : 0;
+};
+
+projects.sort((a, b) => projectYear(b) - projectYear(a));
 ---
 
 <section id="portafolio" class="py-24 lg:py-32">
@@ -233,13 +240,17 @@ const projects: Project[] = await getProjects().catch(() => []);
     const projects = Array.from(
       root.querySelectorAll<HTMLElement>("[data-project]"),
     );
-    const pagination = root.querySelector<HTMLElement>("[data-pagination]");
+    const section = root.closest("section");
+    const pagination =
+      section?.querySelector<HTMLElement>("[data-pagination]") ?? null;
     const pagesContainer =
-      root.querySelector<HTMLElement>("[data-pagination-pages]");
+      section?.querySelector<HTMLElement>("[data-pagination-pages]") ?? null;
     const prevButton =
-      root.querySelector<HTMLButtonElement>("[data-pagination-prev]");
+      section?.querySelector<HTMLButtonElement>("[data-pagination-prev]") ??
+      null;
     const nextButton =
-      root.querySelector<HTMLButtonElement>("[data-pagination-next]");
+      section?.querySelector<HTMLButtonElement>("[data-pagination-next]") ??
+      null;
 
     if (pagination && projects.length > perPage) {
       const totalPages = Math.ceil(projects.length / perPage);

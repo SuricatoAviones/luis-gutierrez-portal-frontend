@@ -30,6 +30,7 @@ jobs:
         run: pnpm run build
         env:
           WP_API_URL: ${{ secrets.WORDPRESS_API_URL }}
+          CF7_FORM_ID: ${{ secrets.CF7_FORM_ID }}
 
       - name: Deploy to cPanel via FTP (lftp)
         env:

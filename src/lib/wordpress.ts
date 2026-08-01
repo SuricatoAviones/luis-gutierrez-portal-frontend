@@ -41,6 +41,7 @@ export interface ProjectFields {
 
 export interface Project {
   id: number;
+  date: string;
   title: { rendered: string };
   acf?: ProjectFields;
 }
@@ -176,8 +177,10 @@ export async function getCategories(): Promise<WPCategory[]> {
 export async function getProjects(): Promise<Project[]> {
   return wpFetch<Project[]>("/wp/v2/portfolio", {
     per_page: String(maxPerPage),
-    _fields: "id,title,acf",
+    _fields: "id,date,title,acf",
     acf_format: "standard",
+    orderby: "date",
+    order: "desc",
   });
 }
 

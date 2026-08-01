@@ -1,8 +1,10 @@
 ---
-const formspreeFormId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
-const formspreeEndpoint = formspreeFormId
-  ? `https://formspree.io/f/${formspreeFormId}`
-  : "";
+const wpApiUrl = import.meta.env.WP_API_URL?.replace(/\/+$/, "");
+const cf7FormId = import.meta.env.CF7_FORM_ID?.trim();
+const cf7Endpoint =
+  wpApiUrl && cf7FormId
+    ? `${wpApiUrl}/contact-form-7/v1/contact-forms/${cf7FormId}/feedback`
+    : "";
 ---
 
 <section id="contacto" class="py-24 lg:py-32 bg-surface-low">
@@ -82,9 +84,9 @@ const formspreeEndpoint = formspreeFormId
       <div class="lg:col-span-7 reveal [animation-delay:150ms]">
         <form
           id="contact-form"
-          action={formspreeEndpoint || undefined}
+          action={cf7Endpoint || undefined}
           method="post"
-          data-endpoint={formspreeEndpoint}
+          data-endpoint={cf7Endpoint}
           class="bg-surface-container rounded-xl p-8 space-y-5 ghost-border"
         >
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -98,7 +100,7 @@ const formspreeEndpoint = formspreeFormId
               </label>
               <input
                 id="name"
-                name="name"
+                name="your-name"
                 type="text"
                 autocomplete="name"
                 required
@@ -116,7 +118,7 @@ const formspreeEndpoint = formspreeFormId
               </label>
               <input
                 id="email"
-                name="email"
+                name="your-email"
                 type="email"
                 autocomplete="email"
                 required
@@ -136,7 +138,7 @@ const formspreeEndpoint = formspreeFormId
             </label>
             <input
               id="subject"
-              name="subject"
+                name="your-subject"
               type="text"
               placeholder="¿En qué puedo ayudarte?"
               class="w-full bg-surface-highest rounded-lg px-4 py-3 text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200"
@@ -153,7 +155,7 @@ const formspreeEndpoint = formspreeFormId
             </label>
             <textarea
               id="message"
-              name="message"
+              name="your-message"
               required
               rows="5"
               placeholder="Cuéntame sobre tu proyecto..."
@@ -234,6 +236,13 @@ const formspreeEndpoint = formspreeFormId
         return;
       }
 
+      const cf7FormId = endpoint.match(/\/(\d+)\/feedback$/)?.[1];
+      const formData = new FormData(form);
+      if (cf7FormId) {
+        formData.set("_wpcf7", cf7FormId);
+        formData.set("_wpcf7_unit_tag", `wpcf7-f${cf7FormId}-p0-o1`);
+      }
+
       submitButton.disabled = true;
       buttonText.textContent = "Enviando...";
 
@@ -241,16 +250,32 @@ const formspreeEndpoint = formspreeFormId
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { Accept: "application/json" },
-          body: new FormData(form),
+          body: formData,
         });
 
-        if (!response.ok) throw new Error("No se pudo enviar el formulario");
+        let result: { status?: string; message?: string } | null = null;
+        try {
+          result = await response.json();
+        } catch {
+          result = null;
+        }
+
+        if (!response.ok || result?.status !== "mail_sent") {
+          throw new Error(
+            result?.message ?? "No se pudo enviar el formulario",
+          );
+        }
 
         form.reset();
-        showStatus("Mensaje enviado. Te responderé pronto.", "success");
-      } catch {
         showStatus(
-          "No se pudo enviar el mensaje. Escríbeme directamente al email.",
+          result.message ?? "Mensaje enviado. Te responderé pronto.",
+          "success",
+        );
+      } catch (error) {
+        showStatus(
+          error instanceof Error
+            ? error.message
+            : "No se pudo enviar el mensaje. Escríbeme directamente al email.",
           "error",
         );
       } finally {

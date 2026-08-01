@@ -9,6 +9,21 @@ import {
 } from "@/lib/wordpress";
 
 const experiences: Experience[] = await getExperiences().catch(() => []);
+
+const dateValue = (value: string | undefined, fallback = 0): number => {
+  const trimmed = value?.trim();
+  if (!trimmed || trimmed.toLowerCase() === "presente") return fallback;
+  const [year, month] = trimmed.split("-").map(Number);
+  if (!Number.isFinite(year)) return fallback;
+  return year * 100 + (Number.isFinite(month) ? month : 0);
+};
+
+experiences.sort((a, b) => {
+  const aEnd = dateValue(a.acf?.end_date, Infinity);
+  const bEnd = dateValue(b.acf?.end_date, Infinity);
+  if (aEnd !== bEnd) return bEnd - aEnd;
+  return dateValue(b.acf?.start_date) - dateValue(a.acf?.start_date);
+});
 ---
 
 <section id="experiencia" class="py-24 lg:py-32">
