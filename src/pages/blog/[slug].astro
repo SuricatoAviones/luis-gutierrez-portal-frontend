@@ -13,7 +13,6 @@ import {
 } from "@/lib/wordpress";
 import { buildMetaDescription } from "@/lib/seo";
 
-
 // Necesario en output: 'static' — genera una página por cada post en el build
 export async function getStaticPaths() {
   // Slugs de fallback — deben coincidir con los de BlogPreview.astro
@@ -66,7 +65,7 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
 >
   <NavBar slot="nav" />
 
-  <article class="max-w-3xl mx-auto px-6 lg:px-10 py-16">
+  <article class="max-w-5xl mx-auto px-6 lg:px-10 py-16">
     <!-- Breadcrumb -->
     <nav
       class="flex items-center gap-2 text-xs text-on-surface-variant mb-10"
@@ -127,9 +126,8 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
           alt={postTitle}
           class="mb-12 rounded-xl aspect-video w-full object-cover"
           loading="eager"
-          formats={['avif', 'webp']}
+          formats={["avif", "webp"]}
           inferSize={true}
-
         />
       )
     }
@@ -212,10 +210,13 @@ const pubDate = new Date(post.date).toLocaleDateString("es-ES", {
     @apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
   }
   .prose-content :global(ul) {
-    @apply list-disc list-inside mb-5 space-y-1 text-on-surface/80;
+    @apply list-disc list-outside pl-6 mb-5 space-y-1 text-on-surface/80;
   }
   .prose-content :global(ol) {
-    @apply list-decimal list-inside mb-5 space-y-1 text-on-surface/80;
+    @apply list-decimal list-outside pl-6 mb-5 space-y-1 text-on-surface/80;
+  }
+  .prose-content :global(li > p) {
+    @apply mb-0;
   }
   .prose-content :global(blockquote) {
     @apply border-l-4 border-primary pl-5 my-6 italic text-on-surface-variant;
