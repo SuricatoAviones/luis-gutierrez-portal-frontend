@@ -1,0 +1,164 @@
+---
+// src/pages/terminos-y-condiciones.astro
+import Layout from "@/layouts/Layout.astro";
+import Navbar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+
+const updatedAt = "2 de agosto de 2026";
+---
+
+<Layout
+  title="Términos y Condiciones · Luis Angel Gutierrez"
+  description="Términos y condiciones de uso del sitio web de Luis Angel Gutierrez: condiciones de navegación, propiedad intelectual y limitaciones de responsabilidad."
+>
+  <Navbar slot="nav" />
+
+  <!-- Encabezado de la página -->
+  <section
+    class="py-20"
+    style="border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+  >
+    <div class="max-w-content mx-auto px-6 lg:px-10">
+      <div class="flex items-center gap-4 mb-6">
+        <span class="block w-8 h-px bg-primary"></span>
+        <span class="font-mono text-xs text-primary uppercase tracking-widest"
+          >Legal</span
+        >
+      </div>
+      <h1
+        class="font-headline text-5xl lg:text-6xl font-bold text-on-surface leading-tight"
+      >
+        Términos y <em class="text-primary font-normal italic">Condiciones</em>
+      </h1>
+      <p class="mt-6 max-w-lg text-on-surface-variant text-lg font-light">
+        Última actualización: {updatedAt}
+      </p>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <section class="py-16">
+    <div class="max-w-content mx-auto px-6 lg:px-10">
+      <div class="max-w-3xl space-y-12">
+        <div>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Estos términos y condiciones regulan el acceso y uso del sitio web
+            de Luis Angel Gutierrez. Al navegar por este sitio, aceptas las
+            condiciones descritas a continuación.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            1. Aceptación de los términos
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            El uso de este sitio web implica la aceptación plena de estos
+            términos y condiciones. Si no estás de acuerdo con alguna parte de
+            ellos, te recomendamos no utilizar el sitio.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            2. Uso del sitio
+          </h2>
+          <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-light leading-relaxed">
+            <li>
+              El sitio es de carácter informativo y de presentación profesional.
+            </li>
+            <li>
+              Te comprometes a no utilizar el sitio con fines ilícitos o que
+              puedan dañar, sobrecargar o deteriorar su funcionamiento.
+            </li>
+            <li>
+              Queda prohibido intentar acceder a áreas restringidas o interferir
+              con la seguridad del sitio.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            3. Propiedad intelectual
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Todo el contenido del sitio —textos, diseños, logos, imágenes y
+            código— es propiedad de Luis Angel Gutierrez o de sus respectivos
+            titulares, y está protegido por las leyes de propiedad intelectual.
+            Queda prohibida su reproducción, distribución o uso sin
+            autorización previa por escrito.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            4. Enlaces a sitios de terceros
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            El sitio puede contener enlaces a sitios web externos (como redes
+            sociales). No me responsabilizo del contenido ni de las políticas de
+            privacidad de dichos sitios, que se rigen por sus propios términos.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            5. Limitación de responsabilidad
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            El contenido del sitio se ofrece con fines informativos y no
+            constituye asesoramiento profesional. No se garantiza la
+            disponibilidad ininterrumpida del sitio ni la ausencia de errores.
+            El uso del sitio se realiza bajo la responsabilidad del usuario.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            6. Contacto y comunicaciones
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Si me escribes a través del formulario de contacto, la información
+            proporcionada se utilizará únicamente para atender tu consulta,
+            conforme a lo indicado en la
+            <a
+              href="/politica-de-privacidad"
+              class="text-primary underline underline-offset-4 hover:opacity-80 transition-opacity"
+              > política de privacidad</a
+            >.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            7. Modificaciones
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Estos términos pueden actualizarse en cualquier momento. La fecha de
+            última actualización se indica al inicio de esta página, y la
+            versión vigente será siempre la publicada en este sitio.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            8. Legislación aplicable
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Estos términos se rigen por la legislación vigente. Para cualquier
+            cuestión relativa a ellos, puedes ponerte en contacto a través de la
+            página de
+            <a
+              href="/contacto"
+              class="text-primary underline underline-offset-4 hover:opacity-80 transition-opacity"
+              > contacto</a
+            >.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>

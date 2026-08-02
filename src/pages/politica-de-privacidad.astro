@@ -1,0 +1,176 @@
+---
+// src/pages/politica-de-privacidad.astro
+import Layout from "@/layouts/Layout.astro";
+import Navbar from "@/components/ui/NavBar.astro";
+import Footer from "@/components/ui/Footer.astro";
+
+const updatedAt = "2 de agosto de 2026";
+---
+
+<Layout
+  title="Política de Privacidad · Luis Angel Gutierrez"
+  description="Política de privacidad del sitio web de Luis Angel Gutierrez: qué datos se recopilan, cómo se utilizan y los derechos que tienes sobre ellos."
+>
+  <Navbar slot="nav" />
+
+  <!-- Encabezado de la página -->
+  <section
+    class="py-20"
+    style="border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+  >
+    <div class="max-w-content mx-auto px-6 lg:px-10">
+      <div class="flex items-center gap-4 mb-6">
+        <span class="block w-8 h-px bg-primary"></span>
+        <span class="font-mono text-xs text-primary uppercase tracking-widest"
+          >Legal</span
+        >
+      </div>
+      <h1
+        class="font-headline text-5xl lg:text-6xl font-bold text-on-surface leading-tight"
+      >
+        Política de <em class="text-primary font-normal italic">Privacidad</em>
+      </h1>
+      <p class="mt-6 max-w-lg text-on-surface-variant text-lg font-light">
+        Última actualización: {updatedAt}
+      </p>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <section class="py-16">
+    <div class="max-w-content mx-auto px-6 lg:px-10">
+      <div class="max-w-3xl space-y-12">
+        <div>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            En este sitio web, propiedad de Luis Angel Gutierrez, me tomo en
+            serio la privacidad de quienes lo visitan. Esta política explica qué
+            información se recopila, cómo se usa y qué derechos tienes sobre
+            ella.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            1. Responsable del tratamiento
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            El responsable del tratamiento de los datos personales es Luis
+            Angel Gutierrez, Ingeniero de Sistemas. Puedes contactarme a través
+            de la página de
+            <a
+              href="/contacto"
+              class="text-primary underline underline-offset-4 hover:opacity-80 transition-opacity"
+              > contacto</a
+            >.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            2. Datos que se recopilan
+          </h2>
+          <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-light leading-relaxed">
+            <li>
+              <strong class="text-on-surface font-medium">
+                Datos de contacto:
+              </strong>
+              nombre y correo electrónico, únicamente si me escribes a través
+              del formulario de contacto.
+            </li>
+            <li>
+              <strong class="text-on-surface font-medium">
+                Datos técnicos de navegación:
+              </strong>
+              dirección IP, tipo de navegador y dispositivo, y páginas
+              visitadas, recopilados de forma anónima por el servicio de
+              hosting y análisis.
+            </li>
+            <li>
+              <strong class="text-on-surface font-medium">
+                Preferencias del sitio:
+              </strong>
+              tu selección de tema (claro u oscuro), almacenada localmente en
+              tu navegador.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            3. Finalidad del tratamiento
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Los datos se utilizan exclusivamente para:
+          </p>
+          <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-light leading-relaxed">
+            <li>Responder a las consultas que me envías por contacto.</li>
+            <li>
+              Garantizar el correcto funcionamiento y la seguridad del sitio.
+            </li>
+            <li>
+              Mejorar la experiencia de navegación mediante estadísticas
+              anónimas.
+            </li>
+          </ul>
+          <p class="mt-4 text-on-surface-variant font-light leading-relaxed">
+            No vendo, alquilo ni comparto tus datos personales con terceros con
+            fines comerciales.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            4. Almacenamiento y seguridad
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Los datos se conservan únicamente durante el tiempo necesario para
+            cumplir la finalidad para la que fueron recopilados. Se aplican
+            medidas técnicas y organizativas razonables para protegerlos frente
+            a accesos no autorizados, pérdidas o alteraciones.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            5. Cookies
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Este sitio utiliza almacenamiento local del navegador únicamente
+            para recordar tu preferencia de tema (claro u oscuro). No se usan
+            cookies de publicidad ni de seguimiento de terceros.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            6. Tus derechos
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            De acuerdo con la legislación aplicable (incluido el RGPD), tienes
+            derecho a acceder, rectificar, suprimir y oponerte al tratamiento de
+            tus datos personales, así como a solicitar su portabilidad. Para
+            ejercer estos derechos, contáctame por la página de
+            <a
+              href="/contacto"
+              class="text-primary underline underline-offset-4 hover:opacity-80 transition-opacity"
+              > contacto</a
+            >.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="font-headline text-3xl font-semibold mb-4">
+            7. Cambios en esta política
+          </h2>
+          <p class="text-on-surface-variant font-light leading-relaxed">
+            Puedo actualizar esta política de privacidad periódicamente. Los
+            cambios se publicarán en esta página con la fecha de última
+            actualización indicada al inicio.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>

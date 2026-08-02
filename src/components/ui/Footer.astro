@@ -43,19 +43,33 @@ const socialLinks = [
       </div>
     </div>
 
-    <!-- Línea inferior -->
-    <div
-      class="mt-8 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
-      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
-    >
-      <p class="text-xs text-on-surface-variant">
-        © {year} Luis Gutierrez. Todos los derechos reservados.
-      </p>
-      <p class="text-xs text-on-surface-variant">
-        Construido con <span class="text-primary">Astro</span> + <span
-          class="text-primary">Tailwind</span
-        >
-      </p>
-    </div>
+      <!-- Línea inferior -->
+      <div
+        class="mt-8 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+        style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
+      >
+        <p class="text-xs text-on-surface-variant">
+          © {year} Luis Gutierrez. Todos los derechos reservados.
+        </p>
+        <nav class="flex items-center gap-6" aria-label="Enlaces legales">
+          <a
+            href="/politica-de-privacidad"
+            class="text-xs text-on-surface-variant hover:text-primary transition-colors duration-200"
+          >
+            Política de privacidad
+          </a>
+          <a
+            href="/terminos-y-condiciones"
+            class="text-xs text-on-surface-variant hover:text-primary transition-colors duration-200"
+          >
+            Términos y condiciones
+          </a>
+          <p class="text-xs text-on-surface-variant">
+            Construido con <span class="text-primary">Astro</span> + <span
+              class="text-primary">Tailwind</span
+            >
+          </p>
+        </nav>
+      </div>
   </div>
 </footer>
