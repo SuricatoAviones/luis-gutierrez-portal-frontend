@@ -3,6 +3,15 @@ import "@/styles/global.css";
 import Profile from "@/assets/profile.png";
 import { buildMetaDescription } from "@/lib/seo";
 
+// Fuentes auto-alojadas (sin dependencia de Google Fonts en la ruta crítica)
+import "@fontsource-variable/newsreader/standard.css";
+import "@fontsource-variable/newsreader/standard-italic.css";
+import "@fontsource-variable/manrope/index.css";
+import "@fontsource-variable/jetbrains-mono/index.css";
+
+import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-standard-normal.woff2?url";
+import manropeLatin from "@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url";
+
 interface Props {
   title?: string;
   description?: string;
@@ -61,12 +70,20 @@ const whatsappUrl = `https://wa.me/584148600062?text=${encodeURIComponent(
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Google Fonts: Newsreader + Manrope + JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Fonts: Newsreader + Manrope + JetBrains Mono (self-hosted) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href={newsreaderLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={manropeLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
 
     <!-- Theme: prevent flash of wrong color scheme -->

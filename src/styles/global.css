@@ -146,9 +146,9 @@
   --color-surface-tint:         var(--surface-tint);
 
   /* ── Tipografías ─────────────────────────── */
-  --font-headline: "Newsreader", Georgia, serif;
-  --font-body:     "Manrope", system-ui, sans-serif;
-  --font-mono:     "JetBrains Mono", ui-monospace, monospace;
+  --font-headline: "Newsreader Variable", Georgia, serif;
+  --font-body:     "Manrope Variable", system-ui, sans-serif;
+  --font-mono:     "JetBrains Mono Variable", ui-monospace, monospace;
 
   /* ── Font sizes extra ────────────────────── */
   --text-2xs: 0.65rem;
