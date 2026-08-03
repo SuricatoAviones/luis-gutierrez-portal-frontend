@@ -4,13 +4,15 @@ import Profile from "@/assets/profile.png";
 import { buildMetaDescription } from "@/lib/seo";
 
 // Fuentes auto-alojadas (sin dependencia de Google Fonts en la ruta crítica)
-import "@fontsource-variable/newsreader/standard.css";
-import "@fontsource-variable/newsreader/standard-italic.css";
+import "@fontsource-variable/newsreader/wght.css";
+import "@fontsource-variable/newsreader/wght-italic.css";
 import "@fontsource-variable/manrope/index.css";
 import "@fontsource-variable/jetbrains-mono/index.css";
 
-import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-standard-normal.woff2?url";
+import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+import newsreaderLatinItalic from "@fontsource-variable/newsreader/files/newsreader-latin-wght-italic.woff2?url";
 import manropeLatin from "@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url";
+import jetbrainsLatin from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
 
 interface Props {
   title?: string;
@@ -80,7 +82,21 @@ const whatsappUrl = `https://wa.me/584148600062?text=${encodeURIComponent(
     />
     <link
       rel="preload"
+      href={newsreaderLatinItalic}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
       href={manropeLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={jetbrainsLatin}
       as="font"
       type="font/woff2"
       crossorigin
