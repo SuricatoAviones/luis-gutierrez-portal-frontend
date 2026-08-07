@@ -60,7 +60,7 @@ const formatDate = (value: string) => {
 
     {
       posts.length > 0 ? (
-        <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 pl-8 pr-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:p-0">
+        <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 pl-12 pr-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:p-0">
           {posts.map((post, index) => {
             const title = stripHtml(post.title.rendered) || "Artículo";
             const excerpt = stripHtml(post.excerpt.rendered);
