@@ -37,7 +37,7 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
     {
       projects.length > 0 ? (
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-6"
+          class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:p-0"
           data-portfolio
         >
           {projects.map((project, index) => {
@@ -53,7 +53,7 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
             return (
               <article
                 data-project
-                class="reveal group relative flex flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest transition-all duration-300 hover:-translate-y-1 ghost-border"
+                class="reveal group relative flex w-[calc(100%-1.5rem)] shrink-0 snap-start flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest transition-all duration-300 hover:-translate-y-1 ghost-border md:w-auto"
                 style={`animation-delay: ${(index % 2) * 100}ms`}
               >
                 <div class="relative w-full aspect-video bg-surface-container overflow-hidden">
@@ -253,6 +253,7 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
       null;
 
     if (pagination && projects.length > perPage) {
+      const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
       const totalPages = Math.ceil(projects.length / perPage);
       let currentPage = 1;
 
@@ -271,8 +272,11 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
       }
 
       const render = () => {
+        const isDesktop = desktopMediaQuery.matches;
+
         projects.forEach((project, index) => {
-          project.hidden = Math.floor(index / perPage) + 1 !== currentPage;
+          project.hidden =
+            isDesktop && Math.floor(index / perPage) + 1 !== currentPage;
         });
 
         prevButton?.toggleAttribute("disabled", currentPage === 1);
@@ -292,6 +296,8 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
             button.removeAttribute("aria-current");
           }
         });
+
+        pagination.hidden = !isDesktop;
       };
 
       function selectPage(page: number) {
@@ -302,8 +308,8 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
 
       prevButton?.addEventListener("click", () => selectPage(currentPage - 1));
       nextButton?.addEventListener("click", () => selectPage(currentPage + 1));
+      desktopMediaQuery.addEventListener("change", render);
 
-      pagination.hidden = false;
       render();
     }
   }

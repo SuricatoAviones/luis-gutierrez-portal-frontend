@@ -36,7 +36,7 @@ const getLevel = (skill: Skill) => {
       skillGroups.length > 0 ? (
         <>
           <div
-            class="flex flex-wrap gap-2 mb-12 reveal"
+            class="flex flex-nowrap gap-2 mb-12 overflow-x-auto pb-2 -mx-6 px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:p-0 reveal"
             role="tablist"
             aria-label="Categorías de habilidades"
             data-skill-tablist
@@ -70,7 +70,7 @@ const getLevel = (skill: Skill) => {
               data-skill-panel
               data-skill-index={groupIndex}
               hidden={groupIndex !== 0}
-              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:p-0 lg:grid-cols-3"
             >
               {categorySkills.map((skill, skillIndex) => {
                 const title =
@@ -79,7 +79,7 @@ const getLevel = (skill: Skill) => {
 
                 return (
                   <div
-                    class="reveal group bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border"
+                    class="reveal group w-[calc(100%-1.5rem)] shrink-0 snap-start bg-surface-low hover:bg-surface-highest rounded-xl p-5 transition-all duration-300 ghost-border md:w-auto"
                     style={`animation-delay: ${skillIndex * 60}ms`}
                   >
                     <div class="flex items-center justify-between mb-3">
