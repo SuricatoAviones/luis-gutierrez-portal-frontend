@@ -1,80 +1,103 @@
 ---
+// Plantilla única de artículo. En cPanel, public/.htaccess reescribe
+// /blog/<slug> hacia esta página (la URL visible no cambia) y el artículo
+// se consulta a WordPress desde el navegador. También acepta ?slug=<slug>.
 import { Picture } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/ui/NavBar.astro";
 import Footer from "@/components/ui/Footer.astro";
 import Profile from "@/assets/profile.png";
-
-const wpApiBaseRaw =
-  import.meta.env.PUBLIC_WP_API_URL ?? import.meta.env.WP_API_URL ?? "/wp-json";
-const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
 ---
 
 <Layout
-  title="Articulo · Blog de Luis Angel Gutierrez"
-  description="Vista dinámica temporal de un artículo del blog de Luis Angel Gutierrez conectada a WordPress."
-  robots="noindex,follow"
+  title="Artículo · Blog de Luis Angel Gutierrez"
+  description="Artículo del blog de Luis Angel Gutierrez sobre desarrollo full stack y arquitectura web."
+  ogType="article"
 >
   <NavBar slot="nav" />
 
-  <article class="max-w-3xl mx-auto px-6 lg:px-10 py-16">
-    <div id="blog-post-loading" class="text-center py-20">
-      <p class="font-headline text-2xl text-on-surface-variant">
-        Cargando articulo...
-      </p>
-      <p class="text-sm text-on-surface-variant mt-2">
-        Consultando WordPress en tiempo real.
-      </p>
+  <article class="max-w-5xl mx-auto px-6 lg:px-10 py-16" data-blog-post>
+    <div data-view="loading">
+      <p class="sr-only" role="status">Cargando artículo…</p>
+      <div class="h-3 w-40 rounded bg-surface-high animate-pulse mb-10"></div>
+      <div class="h-3 w-32 rounded bg-surface-high animate-pulse mb-4"></div>
+      <div class="h-10 w-5/6 rounded bg-surface-high animate-pulse mb-4"></div>
+      <div class="h-10 w-2/3 rounded bg-surface-high animate-pulse mb-8"></div>
+      <div
+        class="aspect-video w-full rounded-xl bg-surface-container animate-pulse mb-12"
+      >
+      </div>
+      <div class="space-y-3">
+        <div class="h-4 w-full rounded bg-surface-high animate-pulse"></div>
+        <div class="h-4 w-full rounded bg-surface-high animate-pulse"></div>
+        <div class="h-4 w-4/5 rounded bg-surface-high animate-pulse"></div>
+      </div>
     </div>
 
-    <div id="blog-post-error" class="text-center py-20 hidden">
+    <div data-view="not-found" hidden class="text-center py-20">
       <p class="font-headline text-2xl text-on-surface-variant">
-        No se pudo cargar el articulo
-      </p>
-      <p class="text-sm text-on-surface-variant mt-2">
-        Verifica el slug o la conexion con WordPress.
+        Este artículo no existe o fue movido
       </p>
       <a
-        href="/blog"
+        href="/blog/"
+        class="inline-flex mt-6 items-center gap-2 text-sm text-primary hover:underline"
+      >
+        Ver todos los artículos
+      </a>
+    </div>
+
+    <div data-view="error" hidden role="alert" class="text-center py-20">
+      <p class="font-headline text-2xl text-on-surface-variant">
+        No se pudo cargar el artículo
+      </p>
+      <p class="text-sm text-on-surface-variant mt-2">
+        Revisa tu conexión e intenta recargar la página.
+      </p>
+      <a
+        href="/blog/"
         class="inline-flex mt-6 items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
       >
         Volver al blog
       </a>
     </div>
 
-    <div id="blog-post-content" class="hidden">
+    <div data-view="ready" hidden>
+      <!-- Breadcrumb -->
       <nav
         class="flex items-center gap-2 text-xs text-on-surface-variant mb-10"
         aria-label="breadcrumb"
       >
         <a href="/" class="hover:text-on-surface transition-colors">Inicio</a>
         <span>/</span>
-        <a href="/blog" class="hover:text-on-surface transition-colors">Blog</a>
+        <a href="/blog/" class="hover:text-on-surface transition-colors">Blog</a>
         <span>/</span>
         <span
-          id="post-breadcrumb"
-          class="text-on-surface truncate max-w-[220px]"></span>
+          data-field="breadcrumb"
+          class="text-on-surface truncate max-w-[200px]"
+          aria-current="page"></span>
       </nav>
 
+      <!-- Cabecera del artículo -->
       <header class="mb-10">
         <p
-          id="post-date"
+          data-field="date"
           class="font-mono text-xs text-primary uppercase tracking-widest mb-4"
         >
         </p>
 
         <h1
-          id="post-title"
+          data-field="title"
           class="font-headline text-4xl lg:text-5xl font-bold text-on-surface leading-tight mb-6"
         >
         </h1>
 
         <p
-          id="post-excerpt"
+          data-field="excerpt"
           class="text-lg text-on-surface-variant font-light leading-relaxed"
         >
         </p>
 
+        <!-- Separador -->
         <div class="mt-8 flex items-center gap-4">
           <span
             class="block flex-1 h-px"
@@ -91,27 +114,23 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
         </div>
       </header>
 
-      <div
-        id="post-image-wrapper"
-        class="mb-12 rounded-xl overflow-hidden aspect-video hidden"
-      >
-        <div id="post-image-shell" class="w-full h-full" aria-hidden="true">
-          <Picture
-            src={Profile}
-            alt=""
-            class="w-full h-full object-cover"
-            loading="eager"
-            formats={["avif", "webp"]}
-          />
-        </div>
-      </div>
+      <!-- Imagen destacada -->
+      <img
+        data-field="image"
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+        class="mb-12 rounded-xl aspect-video w-full object-cover"
+      />
 
+      <!-- Contenido del post (HTML de WordPress) -->
       <div
-        id="post-body"
+        data-field="content"
         class="prose-content leading-relaxed text-on-surface/90"
       >
       </div>
 
+      <!-- Pie del artículo -->
       <footer
         class="mt-16 pt-8"
         style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 30%, transparent);"
@@ -119,6 +138,7 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
         <div
           class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
         >
+          <!-- Autor -->
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex-shrink-0"
@@ -141,8 +161,9 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
             </div>
           </div>
 
+          <!-- Volver al blog -->
           <a
-            href="/blog"
+            href="/blog/"
             class="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
           >
             <svg
@@ -168,164 +189,123 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
   <Footer slot="footer" />
 </Layout>
 
-<script is:inline define:vars={{ wpApiBase }}>
-  const loading = document.getElementById("blog-post-loading");
-  const error = document.getElementById("blog-post-error");
-  const content = document.getElementById("blog-post-content");
+<script>
+  import { applyImage, getField, setField, showView } from "@/lib/dom";
+  import { buildMetaDescription } from "@/lib/seo";
+  import {
+    formatPostDate,
+    getFeaturedImage,
+    getPostBySlug,
+    getPostUrl,
+    safeDecode,
+    stripHtml,
+    type WPPost,
+  } from "@/lib/wordpress";
 
-  const stripHtml = (value) => {
-    const doc = new DOMParser().parseFromString(value ?? "", "text/html");
-    return (doc.body.textContent ?? "").trim();
-  };
+  const root = document.querySelector<HTMLElement>("[data-blog-post]");
+  if (root) {
+    renderPost(root).catch((error) => {
+      console.error(error);
+      setNoIndex();
+      showView(root, "error");
+    });
+  }
 
-  const formatDate = (value) => {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? ""
-      : date.toLocaleDateString("es-ES", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-  };
+  /** Slug desde /blog/<slug> (reescrito por .htaccess) o desde ?slug=. */
+  function readSlug(): string | null {
+    const fromQuery = new URLSearchParams(window.location.search).get("slug");
+    if (fromQuery?.trim()) return fromQuery.trim();
 
-  const findPostBySlug = async (slug) => {
-    // Primer intento: endpoint nativo por slug
-    try {
-      const bySlugResponse = await fetch(
-        `${wpApiBase}/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=1`,
-      );
+    const match = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+    if (!match?.[1] || match[1] === "post") return null;
+    return safeDecode(match[1]);
+  }
 
-      if (bySlugResponse.ok) {
-        const bySlugPosts = await bySlugResponse.json();
-        if (Array.isArray(bySlugPosts) && bySlugPosts.length > 0) {
-          const exact = bySlugPosts.find(
-            (item) => String(item?.slug ?? "") === slug,
-          );
+  function setMeta(selector: string, value: string): void {
+    document.querySelector(selector)?.setAttribute("content", value);
+  }
 
-          if (exact) return exact;
-        }
-      }
-    } catch {
-      // Continua al fallback paginado
+  function setNoIndex(): void {
+    setMeta('meta[name="robots"]', "noindex,follow");
+  }
+
+  function updateMeta(post: WPPost, title: string, excerpt: string): void {
+    const pageTitle = `${title} · Blog de Luis Angel Gutierrez`;
+    const description = buildMetaDescription(
+      excerpt,
+      `Lee ${title} en el blog de Luis Angel Gutierrez sobre desarrollo full stack y arquitectura web.`,
+    );
+    // El canonical generado en build ya apunta al dominio público del sitio.
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const url = new URL(
+      getPostUrl(post),
+      canonical?.getAttribute("href") ?? window.location.origin,
+    ).href;
+    const image = getFeaturedImage(post)?.src;
+
+    document.title = pageTitle;
+    canonical?.setAttribute("href", url);
+    setMeta('meta[name="description"]', description);
+    setMeta('meta[property="og:url"]', url);
+    setMeta('meta[property="og:title"]', pageTitle);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:image:alt"]', pageTitle);
+    setMeta('meta[name="twitter:title"]', pageTitle);
+    setMeta('meta[name="twitter:description"]', description);
+    if (image) {
+      setMeta('meta[property="og:image"]', image);
+      setMeta('meta[name="twitter:image"]', image);
     }
 
-    // Fallback: recorre pages hasta encontrar el slug exacto
-    const seenKeys = new Set();
-    const requestPerPage = 100;
-    const maxPages = 80;
+    // Si se llegó por ?slug=, se muestra la URL pública del artículo.
+    if (window.location.pathname !== getPostUrl(post)) {
+      history.replaceState(history.state, "", getPostUrl(post));
+    }
+  }
 
-    for (let page = 1; page <= maxPages; page += 1) {
-      const response = await fetch(
-        `${wpApiBase}/wp/v2/posts?per_page=${requestPerPage}&page=${page}&_embed=1`,
-      );
-
-      if (!response.ok) {
-        break;
-      }
-
-      const pagePosts = await response.json();
-      if (!Array.isArray(pagePosts) || pagePosts.length === 0) {
-        break;
-      }
-
-      let addedInPage = 0;
-
-      for (const post of pagePosts) {
-        const key = String(post?.id ?? post?.slug ?? "");
-        if (!key || seenKeys.has(key)) continue;
-
-        seenKeys.add(key);
-        addedInPage += 1;
-
-        if (String(post?.slug ?? "") === slug) {
-          return post;
-        }
-      }
-
-      const totalPagesHeader = Number(
-        response.headers.get("X-WP-TotalPages") ?? "0",
-      );
-
-      if (
-        (Number.isFinite(totalPagesHeader) &&
-          totalPagesHeader > 0 &&
-          page >= totalPagesHeader) ||
-        addedInPage === 0
-      ) {
-        break;
-      }
+  async function renderPost(root: HTMLElement) {
+    const slug = readSlug();
+    if (!slug) {
+      setNoIndex();
+      showView(root, "not-found");
+      return;
     }
 
-    return null;
-  };
-
-  const loadPost = async () => {
-    try {
-      const slug = new URLSearchParams(window.location.search).get("slug");
-      if (!slug || !wpApiBase) throw new Error("Slug o API base invalida");
-
-      const post = await findPostBySlug(slug);
-      if (!post) throw new Error("Post no encontrado");
-
-      const featuredImage =
-        post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
-      const titleText = stripHtml(post.title?.rendered ?? "Articulo");
-      const excerptText = stripHtml(post.excerpt?.rendered ?? "");
-
-      const breadcrumb = document.getElementById("post-breadcrumb");
-      const postDate = document.getElementById("post-date");
-      const postTitle = document.getElementById("post-title");
-      const postExcerpt = document.getElementById("post-excerpt");
-      const postBody = document.getElementById("post-body");
-      const imageWrapper = document.getElementById("post-image-wrapper");
-      const imageShell = document.getElementById("post-image-shell");
-
-      if (breadcrumb) breadcrumb.textContent = titleText;
-      if (postDate) postDate.textContent = formatDate(post.date);
-      if (postTitle) postTitle.textContent = titleText;
-      if (postExcerpt) postExcerpt.textContent = excerptText;
-      if (postBody) postBody.innerHTML = post.content?.rendered ?? "";
-
-      if (featuredImage && imageWrapper && imageShell) {
-        const picture = imageShell.querySelector("picture");
-        const image = picture?.querySelector("img");
-
-        picture
-          ?.querySelectorAll("source")
-          .forEach((source) => source.remove());
-
-        if (image) {
-          image.src = featuredImage;
-          image.srcset = featuredImage;
-          image.alt = titleText;
-        }
-
-        imageWrapper.classList.remove("hidden");
-      }
-
-      document.title = `${titleText} · Blog de Luis Angel Gutierrez`;
-
-      const metaDescription = document.querySelector(
-        'meta[name="description"]',
-      );
-      if (metaDescription && excerptText) {
-        metaDescription.setAttribute("content", excerptText.slice(0, 160));
-      }
-
-      loading?.classList.add("hidden");
-      content?.classList.remove("hidden");
-    } catch {
-      loading?.classList.add("hidden");
-      error?.classList.remove("hidden");
+    const post = await getPostBySlug(slug);
+    if (!post) {
+      setNoIndex();
+      showView(root, "not-found");
+      return;
     }
-  };
 
-  loadPost();
+    const title = stripHtml(post.title?.rendered ?? "") || "Artículo";
+    const excerpt = stripHtml(post.excerpt?.rendered ?? "");
+
+    setField(root, "breadcrumb", title);
+    setField(root, "date", formatPostDate(post.date));
+    setField(root, "title", title);
+    if (excerpt) setField(root, "excerpt", excerpt);
+    else getField(root, "excerpt")?.remove();
+
+    const content = getField(root, "content");
+    // Contenido propio publicado desde el WordPress del sitio.
+    if (content) content.innerHTML = post.content?.rendered ?? "";
+
+    const image = getFeaturedImage(post);
+    const img = getField<HTMLImageElement>(root, "image");
+    if (image && img) {
+      applyImage(img, image, title, "(min-width: 1024px) 960px, 100vw");
+    } else {
+      img?.remove();
+    }
+
+    updateMeta(post, title, excerpt);
+    showView(root, "ready");
+  }
 </script>
 
 <style>
-  @reference '@/styles/global.css';
+  @reference "@/styles/global.css";
 
   .prose-content :global(h2) {
     @apply font-headline text-2xl font-semibold text-on-surface mt-10 mb-4;
@@ -340,10 +320,13 @@ const wpApiBase = wpApiBaseRaw.replace(/\/$/, "");
     @apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
   }
   .prose-content :global(ul) {
-    @apply list-disc list-inside mb-5 space-y-1 text-on-surface/80;
+    @apply list-disc list-outside pl-6 mb-5 space-y-1 text-on-surface/80;
   }
   .prose-content :global(ol) {
-    @apply list-decimal list-inside mb-5 space-y-1 text-on-surface/80;
+    @apply list-decimal list-outside pl-6 mb-5 space-y-1 text-on-surface/80;
+  }
+  .prose-content :global(li > p) {
+    @apply mb-0;
   }
   .prose-content :global(blockquote) {
     @apply border-l-4 border-primary pl-5 my-6 italic text-on-surface-variant;

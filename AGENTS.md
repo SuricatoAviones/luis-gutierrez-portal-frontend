@@ -18,18 +18,19 @@ No test runner, no linter, no formatter configured.
 
 ## CMS & build
 
-- WordPress headless CMS — content (posts, projects, skills, experience) fetched at **build time** via `src/lib/wordpress.ts`.
-- After editing content in WordPress, run `pnpm build` and redeploy to reflect changes.
-- `/blog/post` is a client-side fallback (noindex) for posts published between deploys.
+- WordPress headless CMS — content (posts, projects, skills, experience) is fetched **in the browser** via `src/lib/wordpress.ts` (the site is static HTML on cPanel). Content changes in WordPress show up without rebuilding; redeploy only for code/env changes.
+- Sections render client-side: each has `[data-view="loading|ready|empty|error"]` blocks plus `<template>` markup filled by a `<script>` (helpers in `src/lib/dom.ts`). Don't add build-time `fetch` calls in frontmatter.
+- ACF returns `false`/`null` for empty fields — read ACF values through `acfText()`.
+- `/blog/?page=N` is the paginated index. `/blog/<slug>` is served by the single shell page `src/pages/blog/post.astro` via a rewrite in `public/.htaccess` (and a dev-only middleware in `astro.config.mjs`; `pnpm preview` lacks it, use `/blog/post/?slug=<slug>`).
 
 ## Env vars
 
 | Var | Scope | Required |
 |-----|-------|----------|
-| `WP_API_URL` | Build-time only | Yes |
-| `PUBLIC_FORMSPREE_FORM_ID` | Browser (Formspree) | No (contact form) |
+| `WP_API_URL` | Public, embedded in browser JS (`astro:env/client`) | Yes |
+| `CF7_FORM_ID` | Public (Contact Form 7 endpoint) | No (contact form) |
 
-Copy `.env.example` to `.env`.
+Copy `.env.example` to `.env`. Both are declared in `env.schema` in `astro.config.mjs`.
 
 ## Project quirks
 

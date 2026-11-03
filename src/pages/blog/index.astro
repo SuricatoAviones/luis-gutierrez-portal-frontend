@@ -3,12 +3,6 @@ import BlogList from "@/components/BlogList.astro";
 import NavBar from "@/components/ui/NavBar.astro";
 import Footer from "@/components/ui/Footer.astro";
 import Layout from "@/layouts/Layout.astro";
-import { getAllPosts, type WPPost } from "@/lib/wordpress";
-
-const postsPerPage = 9;
-const allPosts: WPPost[] = await getAllPosts().catch(() => []);
-const posts = allPosts.slice(0, postsPerPage);
-const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
 ---
 
 <Layout
@@ -42,7 +36,7 @@ const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
     </div>
   </section>
 
-  <BlogList posts={posts} currentPage={1} totalPages={totalPages} />
+  <BlogList postsPerPage={9} />
 
   <Footer slot="footer" />
 </Layout>

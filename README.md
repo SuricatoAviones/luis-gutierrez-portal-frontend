@@ -7,7 +7,7 @@ Sitio personal y blog técnico construido con Astro, Tailwind CSS y WordPress co
 - Astro 7 con salida estática
 - Tailwind CSS 4
 - WordPress REST API y campos ACF para proyectos, habilidades, experiencia y artículos
-- Formspree opcional para el formulario de contacto
+- Contact Form 7 (WordPress) opcional para el formulario de contacto
 
 ## Configuración
 
@@ -21,12 +21,12 @@ Crea un archivo `.env` a partir de `.env.example` y completa las variables neces
 
 ```dotenv
 WP_API_URL=https://tu-dominio.com/wp-json
-PUBLIC_FORMSPREE_FORM_ID=tu_id_de_formspree
+CF7_FORM_ID=123
 ```
 
-`WP_API_URL` se usa únicamente durante el renderizado de Astro. `PUBLIC_FORMSPREE_FORM_ID` se expone en el navegador porque Formspree requiere un identificador público; no incluyas claves privadas en variables con el prefijo `PUBLIC_`.
+Ambas variables son públicas (están declaradas en `env.schema` de `astro.config.mjs` con `context: "client"`): se incrustan en el JS durante el build. No pongas secretos en ellas.
 
-El contenido de WordPress se consulta durante el build. Tras publicar o editar artículos, proyectos, habilidades o experiencia, vuelve a desplegar el sitio para reflejar los cambios.
+El contenido de WordPress (artículos, proyectos, habilidades y experiencia) se consulta **desde el navegador** con `fetch` en cada visita (`src/lib/wordpress.ts`). Por eso los cambios publicados en WordPress se ven sin volver a compilar ni desplegar; solo hace falta redesplegar al cambiar código o variables de entorno. La API de WordPress debe permitir CORS desde el dominio del sitio (WordPress lo hace por defecto en su REST API).
 
 ## Comandos
 
@@ -40,9 +40,8 @@ El contenido de WordPress se consulta durante el build. Tras publicar o editar a
 ## Rutas de contenido
 
 - `/` - Portafolio y vista previa de artículos.
-- `/blog` - Índice de artículos.
-- `/blog/{slug}` - Artículos generados desde WordPress.
-- `/blog/page/{n}` - Páginas posteriores del índice cuando hay más de nueve artículos.
+- `/blog` - Índice de artículos; las páginas siguientes usan `/blog/?page={n}` (nueve artículos por página).
+- `/blog/{slug}` - Artículo. Todas estas URLs usan la plantilla estática `/blog/post/`, que lee el slug de la URL y consulta el artículo a WordPress.
 - `/contacto` - Página de contacto.
 
-La ruta `/blog/post` se conserva con `noindex` como respaldo de cliente para artículos que se publiquen entre dos despliegues.
+En cPanel, `public/.htaccess` reescribe `/blog/{slug}` hacia `/blog/post/index.html` (la URL visible no cambia) y redirige con 301 las URLs antiguas `/blog/page/{n}`. En `pnpm dev` la misma reescritura la hace una integración de `astro.config.mjs`; `pnpm preview` no la aplica, así que ahí usa `/blog/post/?slug={slug}`.

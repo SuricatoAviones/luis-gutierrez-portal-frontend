@@ -1,23 +1,3 @@
----
-import {
-  getProjects,
-  parseTechs,
-  stripHtml,
-  type Project,
-  type ProjectFields,
-} from "@/lib/wordpress";
-import { Picture } from "astro:assets";
-
-const projects: Project[] = await getProjects().catch(() => []);
-
-const projectYear = (project: Project): number => {
-  const years = (project.acf?.year ?? "").match(/\d{4}/g) ?? [];
-  return years.length ? Math.max(...years.map(Number)) : 0;
-};
-
-projects.sort((a, b) => projectYear(b) - projectYear(a));
----
-
 <section id="portafolio" class="py-24 lg:py-32">
   <div class="max-w-content mx-auto px-6 lg:px-10">
     <div class="flex items-center justify-between mb-16 reveal">
@@ -34,133 +14,52 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
       </div>
     </div>
 
-    {
-      projects.length > 0 ? (
+    <div data-portfolio-root aria-busy="true">
+      <div data-view="loading">
+        <p class="sr-only" role="status">Cargando proyectos…</p>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2" aria-hidden="true">
+          {
+            [0, 1].map((index) => (
+              <div
+                class:list={[
+                  "rounded-xl overflow-hidden bg-surface-low ghost-border",
+                  index > 0 && "hidden md:block",
+                ]}
+              >
+                <div class="aspect-video bg-surface-container animate-pulse" />
+                <div class="p-6 space-y-3">
+                  <div class="h-6 w-2/3 rounded bg-surface-high animate-pulse" />
+                  <div class="h-4 w-full rounded bg-surface-high animate-pulse" />
+                  <div class="h-4 w-5/6 rounded bg-surface-high animate-pulse" />
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <p
+        data-view="empty"
+        hidden
+        class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
+      >
+        No hay proyectos disponibles en este momento.
+      </p>
+
+      <p
+        data-view="error"
+        hidden
+        role="alert"
+        class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant"
+      >
+        No se pudieron cargar los proyectos. Intenta recargar la página.
+      </p>
+
+      <div data-view="ready" hidden>
         <div
           class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 pl-12 pr-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:p-0"
           data-portfolio
         >
-          {projects.map((project, index) => {
-            const title =
-              stripHtml(project.title?.rendered ?? "") || "Proyecto";
-            const acf: ProjectFields = project.acf ?? {};
-            const technologies = parseTechs(acf.technologies ?? "");
-            const projectUrl = acf.project_url?.trim();
-            const githubUrl = acf.github_url?.trim();
-            const category = acf.category?.trim() || "Proyecto";
-            const year = acf.year?.trim();
-
-            return (
-              <article
-                data-project
-                class="reveal group relative flex w-[calc(100%-1.5rem)] shrink-0 snap-start flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest transition-all duration-300 hover:-translate-y-1 ghost-border md:w-auto"
-                style={`animation-delay: ${(index % 2) * 100}ms`}
-              >
-                <div class="relative w-full aspect-video bg-surface-container overflow-hidden">
-                  {acf.featured_image ? (
-                    <Picture
-                      src={acf.featured_image}
-                      alt={title}
-                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                      formats={['avif', 'webp']}
-                      inferSize={true}
-                    />
-                  ) : (
-                    <div
-                      class="w-full h-full flex items-center justify-center"
-                      aria-hidden="true"
-                    >
-                      <span class="font-headline text-5xl font-bold text-primary/20">
-                        {title.charAt(0)}
-                      </span>
-                    </div>
-                  )}
-                  <span class="absolute top-4 left-4 font-mono text-2xs uppercase tracking-wider bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full">
-                    {category}
-                  </span>
-                  {year && (
-                    <span class="absolute top-4 right-4 font-mono text-2xs uppercase tracking-wider bg-surface-highest text-on-surface-variant px-3 py-1 rounded-full">
-                      {year}
-                    </span>
-                  )}
-                </div>
-
-                <div class="flex flex-col flex-1 p-6">
-                  <h3 class="font-headline text-xl font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors">
-                    {title}
-                  </h3>
-                  <p class="text-sm text-on-surface-variant leading-relaxed flex-1 mb-5">
-                    {acf.description?.trim() ||
-                      "Proyecto en actualización. Pronto más detalles."}
-                  </p>
-
-                  {technologies.length > 0 && (
-                    <div class="flex flex-wrap gap-2 mb-5">
-                      {technologies.map((technology) => (
-                        <span class="font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full">
-                          {technology}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {(projectUrl && projectUrl !== "#") ||
-                  (githubUrl && githubUrl !== "#") ? (
-                    <div
-                      class="flex items-center gap-4 pt-4"
-                      style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
-                    >
-                      {projectUrl && projectUrl !== "#" && (
-                        <a
-                          href={projectUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="flex items-center gap-1.5 text-sm font-medium text-on-surface hover:text-primary transition-colors"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="2"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                            />
-                          </svg>
-                          Demo en vivo
-                        </a>
-                      )}
-                      {githubUrl && githubUrl !== "#" && (
-                        <a
-                          href={githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                          >
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02.01 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
-                          </svg>
-                          GitHub
-                        </a>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            );
-          })}
         </div>
 
         <div
@@ -186,8 +85,7 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
+                d="M15.75 19.5L8.25 12l7.5-7.5"></path>
             </svg>
             Anterior
           </button>
@@ -197,7 +95,8 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
             data-pagination-pages
             role="group"
             aria-label="Paginación de proyectos"
-          ></div>
+          >
+          </div>
 
           <button
             type="button"
@@ -218,99 +117,296 @@ projects.sort((a, b) => projectYear(b) - projectYear(a));
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M8.25 4.5l7.5 7.5-7.5 7.5"
-              />
+                d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
             </svg>
           </button>
         </div>
-      ) : (
-        <p class="rounded-lg border border-outline-variant/40 bg-surface-low px-4 py-3 text-sm text-on-surface-variant">
-          No hay proyectos disponibles en este momento.
-        </p>
-      )
-    }
+      </div>
+
+      <template data-project-template>
+        <article
+          data-project
+          class="reveal group relative flex w-[calc(100%-1.5rem)] shrink-0 snap-start flex-col bg-surface-low rounded-xl overflow-hidden hover:bg-surface-highest transition-all duration-300 hover:-translate-y-1 ghost-border md:w-auto"
+        >
+          <div
+            class="relative w-full aspect-video bg-surface-container overflow-hidden"
+          >
+            <img
+              data-field="image"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              data-field="placeholder"
+              class="w-full h-full flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <span
+                data-field="initial"
+                class="font-headline text-5xl font-bold text-primary/20"></span>
+            </div>
+            <span
+              data-field="category"
+              class="absolute top-4 left-4 font-mono text-2xs uppercase tracking-wider bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full"
+            ></span>
+            <span
+              data-field="year"
+              class="absolute top-4 right-4 font-mono text-2xs uppercase tracking-wider bg-surface-highest text-on-surface-variant px-3 py-1 rounded-full"
+            ></span>
+          </div>
+
+          <div class="flex flex-col flex-1 p-6">
+            <h3
+              data-field="title"
+              class="font-headline text-xl font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors"
+            >
+            </h3>
+            <p
+              data-field="description"
+              class="text-sm text-on-surface-variant leading-relaxed flex-1 mb-5"
+            >
+            </p>
+
+            <div data-field="technologies" class="flex flex-wrap gap-2 mb-5">
+            </div>
+
+            <div
+              data-field="links"
+              class="flex items-center gap-4 pt-4"
+              style="border-top: 1px solid color-mix(in srgb, var(--outline-variant) 20%, transparent);"
+            >
+              <a
+                data-field="demo"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1.5 text-sm font-medium text-on-surface hover:text-primary transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                  ></path>
+                </svg>
+                Demo en vivo
+              </a>
+              <a
+                data-field="github"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02.01 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"
+                  ></path>
+                </svg>
+                GitHub
+              </a>
+            </div>
+          </div>
+        </article>
+      </template>
+
+      <template data-tech-template>
+        <span
+          class="font-mono text-2xs text-on-surface-variant bg-surface-high px-2.5 py-1 rounded-full"
+        ></span>
+      </template>
+    </div>
   </div>
 </section>
 
 <script>
-  const root = document.querySelector<HTMLElement>("[data-portfolio]");
+  import { applyImage, cloneTemplate, getField, setField, showView } from "@/lib/dom";
+  import {
+    acfText,
+    getProjects,
+    parseTechs,
+    stripHtml,
+    toSafeUrl,
+    type Project,
+  } from "@/lib/wordpress";
 
+  const root = document.querySelector<HTMLElement>("[data-portfolio-root]");
   if (root) {
-    const perPage = 2;
-    const projects = Array.from(
-      root.querySelectorAll<HTMLElement>("[data-project]"),
+    renderPortfolio(root).catch((error) => {
+      console.error(error);
+      showView(root, "error");
+    });
+  }
+
+  function projectYear(project: Project): number {
+    const years = acfText(project.acf?.year).match(/\d{4}/g) ?? [];
+    return years.length ? Math.max(...years.map(Number)) : 0;
+  }
+
+  function createProjectCard(
+    root: HTMLElement,
+    project: Project,
+    index: number,
+  ): HTMLElement {
+    const card = cloneTemplate(root.querySelector("template[data-project-template]"));
+    const acf = project.acf ?? {};
+    const title = stripHtml(project.title?.rendered ?? "") || "Proyecto";
+
+    card.style.animationDelay = `${(index % 2) * 100}ms`;
+    setField(card, "title", title);
+    setField(card, "category", acfText(acf.category) || "Proyecto");
+    setField(
+      card,
+      "description",
+      acfText(acf.description) ||
+        "Proyecto en actualización. Pronto más detalles.",
     );
-    const section = root.closest("section");
-    const pagination =
-      section?.querySelector<HTMLElement>("[data-pagination]") ?? null;
-    const pagesContainer =
-      section?.querySelector<HTMLElement>("[data-pagination-pages]") ?? null;
-    const prevButton =
-      section?.querySelector<HTMLButtonElement>("[data-pagination-prev]") ??
-      null;
-    const nextButton =
-      section?.querySelector<HTMLButtonElement>("[data-pagination-next]") ??
-      null;
 
-    if (pagination && projects.length > perPage) {
-      const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
-      const totalPages = Math.ceil(projects.length / perPage);
-      let currentPage = 1;
+    const year = acfText(acf.year);
+    if (year) setField(card, "year", year);
+    else getField(card, "year")?.remove();
 
-      const pageButtons: HTMLButtonElement[] = [];
+    const image = getField<HTMLImageElement>(card, "image");
+    const imageUrl = toSafeUrl(acf.featured_image);
+    if (image && imageUrl) {
+      applyImage(image, { src: imageUrl, srcset: "" }, title, "");
+      getField(card, "placeholder")?.remove();
+    } else {
+      image?.remove();
+      setField(card, "initial", title.charAt(0));
+    }
 
-      for (let page = 1; page <= totalPages; page++) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = String(page);
-        button.setAttribute("aria-label", `Ir a la página ${page}`);
-        button.className =
-          "font-mono text-sm w-10 h-10 rounded-lg border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:border-primary transition-colors";
-        button.addEventListener("click", () => selectPage(page));
-        pagesContainer?.appendChild(button);
-        pageButtons.push(button);
-      }
+    const technologies = parseTechs(acf.technologies);
+    const techList = getField(card, "technologies");
+    if (techList && technologies.length > 0) {
+      techList.append(
+        ...technologies.map((technology) => {
+          const chip = cloneTemplate(root.querySelector("template[data-tech-template]"));
+          chip.textContent = technology;
+          return chip;
+        }),
+      );
+    } else {
+      techList?.remove();
+    }
 
-      const render = () => {
-        const isDesktop = desktopMediaQuery.matches;
+    const links: [string, string | null][] = [
+      ["demo", toSafeUrl(acf.project_url)],
+      ["github", toSafeUrl(acf.github_url)],
+    ];
+    links.forEach(([name, url]) => {
+      const link = getField<HTMLAnchorElement>(card, name);
+      if (url && link) link.href = url;
+      else link?.remove();
+    });
+    if (links.every(([, url]) => !url)) getField(card, "links")?.remove();
 
-        projects.forEach((project, index) => {
-          project.hidden =
-            isDesktop && Math.floor(index / perPage) + 1 !== currentPage;
-        });
+    return card;
+  }
 
-        prevButton?.toggleAttribute("disabled", currentPage === 1);
-        nextButton?.toggleAttribute("disabled", currentPage === totalPages);
+  async function renderPortfolio(root: HTMLElement) {
+    const projects = await getProjects();
+    const grid = root.querySelector<HTMLElement>("[data-portfolio]");
+    if (projects.length === 0 || !grid) {
+      showView(root, "empty");
+      return;
+    }
 
-        pageButtons.forEach((button, index) => {
-          const selected = index + 1 === currentPage;
-          button.classList.toggle("bg-primary", selected);
-          button.classList.toggle("text-on-primary", selected);
-          button.classList.toggle("border-primary", selected);
-          button.classList.toggle("text-on-surface-variant", !selected);
-          button.classList.toggle("hover:text-on-surface", !selected);
-          button.classList.toggle("hover:border-primary", !selected);
-          if (selected) {
-            button.setAttribute("aria-current", "page");
-          } else {
-            button.removeAttribute("aria-current");
-          }
-        });
+    projects.sort((a, b) => projectYear(b) - projectYear(a));
+    const cards = projects.map((project, index) =>
+      createProjectCard(root, project, index),
+    );
+    grid.replaceChildren(...cards);
+    showView(root, "ready");
+    setupPagination(root, cards);
+  }
 
-        pagination.hidden = !isDesktop;
-      };
+  function setupPagination(root: HTMLElement, projects: HTMLElement[]) {
+    const perPage = 2;
+    const pagination = root.querySelector<HTMLElement>("[data-pagination]");
+    const pagesContainer = root.querySelector<HTMLElement>(
+      "[data-pagination-pages]",
+    );
+    const prevButton = root.querySelector<HTMLButtonElement>(
+      "[data-pagination-prev]",
+    );
+    const nextButton = root.querySelector<HTMLButtonElement>(
+      "[data-pagination-next]",
+    );
 
-      function selectPage(page: number) {
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        render();
-      }
+    if (!pagination || projects.length <= perPage) return;
 
-      prevButton?.addEventListener("click", () => selectPage(currentPage - 1));
-      nextButton?.addEventListener("click", () => selectPage(currentPage + 1));
-      desktopMediaQuery.addEventListener("change", render);
+    const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
+    const totalPages = Math.ceil(projects.length / perPage);
+    let currentPage = 1;
 
+    const pageButtons: HTMLButtonElement[] = [];
+
+    for (let page = 1; page <= totalPages; page++) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = String(page);
+      button.setAttribute("aria-label", `Ir a la página ${page}`);
+      button.className =
+        "font-mono text-sm w-10 h-10 rounded-lg border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:border-primary transition-colors";
+      button.addEventListener("click", () => selectPage(page));
+      pagesContainer?.appendChild(button);
+      pageButtons.push(button);
+    }
+
+    const render = () => {
+      const isDesktop = desktopMediaQuery.matches;
+
+      projects.forEach((project, index) => {
+        project.hidden =
+          isDesktop && Math.floor(index / perPage) + 1 !== currentPage;
+      });
+
+      prevButton?.toggleAttribute("disabled", currentPage === 1);
+      nextButton?.toggleAttribute("disabled", currentPage === totalPages);
+
+      pageButtons.forEach((button, index) => {
+        const selected = index + 1 === currentPage;
+        button.classList.toggle("bg-primary", selected);
+        button.classList.toggle("text-on-primary", selected);
+        button.classList.toggle("border-primary", selected);
+        button.classList.toggle("text-on-surface-variant", !selected);
+        button.classList.toggle("hover:text-on-surface", !selected);
+        button.classList.toggle("hover:border-primary", !selected);
+        if (selected) {
+          button.setAttribute("aria-current", "page");
+        } else {
+          button.removeAttribute("aria-current");
+        }
+      });
+
+      pagination.hidden = !isDesktop;
+    };
+
+    function selectPage(page: number) {
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
       render();
     }
+
+    prevButton?.addEventListener("click", () => selectPage(currentPage - 1));
+    nextButton?.addEventListener("click", () => selectPage(currentPage + 1));
+    desktopMediaQuery.addEventListener("change", render);
+
+    render();
   }
 </script>

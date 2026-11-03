@@ -1,6 +1,8 @@
 ---
-const wpApiUrl = import.meta.env.WP_API_URL?.replace(/\/+$/, "");
-const cf7FormId = import.meta.env.CF7_FORM_ID?.trim();
+import { CF7_FORM_ID, WP_API_URL } from "astro:env/client";
+
+const wpApiUrl = WP_API_URL.trim().replace(/\/+$/, "");
+const cf7FormId = CF7_FORM_ID?.trim();
 const cf7Endpoint =
   wpApiUrl && cf7FormId
     ? `${wpApiUrl}/contact-form-7/v1/contact-forms/${cf7FormId}/feedback`
