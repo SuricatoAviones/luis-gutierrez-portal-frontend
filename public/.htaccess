@@ -3,6 +3,21 @@
 # Funciona en Apache y LiteSpeed (cPanel)
 # ─────────────────────────────────────────────
 
+# Rutas del blog: los artículos se cargan en el navegador desde WordPress,
+# así que todas las URLs /blog/<slug> usan la misma plantilla estática.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Paginación anterior (/blog/page/N) → /blog/?page=N
+  RewriteRule ^blog/page/([0-9]+)/?$ /blog/?page=$1 [R=301,L]
+
+  # /blog/<slug> → /blog/post/index.html (la URL visible no cambia)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^blog/([^/]+)/?$ blog/post/index.html [L]
+</IfModule>
+
 # Expiración por tipo MIME
 <IfModule mod_expires.c>
   ExpiresActive On

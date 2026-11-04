@@ -1,12 +1,34 @@
 /**
- * Utilidades para consultar la REST API de WordPress y sus campos ACF.
+ * Cliente de la REST API de WordPress (con campos ACF) para el navegador.
+ *
+ * El sitio se publica como HTML estático en cPanel, así que el contenido se
+ * consulta en cada visita desde el cliente: lo que se publica o edita en
+ * WordPress aparece sin volver a compilar ni desplegar.
  */
+import { WP_API_URL } from "astro:env/client";
 
-const wpApiBase = (
-  import.meta.env.WP_API_URL ?? import.meta.env.PUBLIC_WP_API_URL ?? ""
-).trim();
+const apiBase = WP_API_URL.trim().replace(/\/+$/, "");
 const maxPerPage = 100;
-const maxPostPages = 100;
+const requestTimeoutMs = 15_000;
+
+// Los listados no necesitan el contenido completo de cada artículo.
+const postSummaryFields = "id,slug,date,title,excerpt,_links,_embedded";
+
+export interface WPImageSize {
+  source_url: string;
+  width: number;
+  height: number;
+}
+
+export interface WPMedia {
+  source_url: string;
+  alt_text?: string;
+  media_details?: {
+    width?: number;
+    height?: number;
+    sizes?: Record<string, WPImageSize>;
+  };
+}
 
 export interface WPPost {
   id: number;
@@ -14,29 +36,29 @@ export interface WPPost {
   date: string;
   title: { rendered: string };
   excerpt: { rendered: string };
-  content: { rendered: string };
+  content?: { rendered: string };
   _embedded?: {
-    "wp:featuredmedia"?: { source_url: string; alt_text: string }[];
-    "wp:term"?: { id: number; name: string; slug: string }[][];
+    "wp:featuredmedia"?: WPMedia[];
   };
-  acf?: Record<string, unknown>;
 }
 
-export interface WPCategory {
-  id: number;
-  name: string;
-  slug: string;
-  count: number;
+export interface PostsPage {
+  posts: WPPost[];
+  total: number;
+  totalPages: number;
 }
+
+/** ACF devuelve `false` o `null` en campos vacíos (p. ej. una imagen sin asignar). */
+export type AcfValue = string | number | false | null | undefined;
 
 export interface ProjectFields {
-  project_url?: string;
-  github_url?: string;
-  description?: string;
-  technologies?: string;
-  featured_image?: string;
-  year?: string;
-  category?: string;
+  project_url?: AcfValue;
+  github_url?: AcfValue;
+  description?: AcfValue;
+  technologies?: AcfValue;
+  featured_image?: AcfValue;
+  year?: AcfValue;
+  category?: AcfValue;
 }
 
 export interface Project {
@@ -47,9 +69,9 @@ export interface Project {
 }
 
 export interface SkillFields {
-  level?: number;
-  category?: string;
-  icon?: string;
+  level?: AcfValue;
+  category?: AcfValue;
+  icon?: AcfValue;
 }
 
 export interface Skill {
@@ -59,13 +81,13 @@ export interface Skill {
 }
 
 export interface ExperienceFields {
-  company?: string;
-  position?: string;
-  start_date?: string;
-  end_date?: string;
-  description?: string;
-  technologies?: string;
-  company_url?: string;
+  company?: AcfValue;
+  position?: AcfValue;
+  start_date?: AcfValue;
+  end_date?: AcfValue;
+  description?: AcfValue;
+  technologies?: AcfValue;
+  company_url?: AcfValue;
 }
 
 export interface Experience {
@@ -74,12 +96,22 @@ export interface Experience {
   acf?: ExperienceFields;
 }
 
-function getApiBase(): string {
-  if (!wpApiBase) {
-    throw new Error("WP_API_URL no configurada");
-  }
+export interface ImageSource {
+  src: string;
+  srcset: string;
+  width?: number;
+  height?: number;
+}
 
-  return wpApiBase.replace(/\/+$/, "");
+/** Error HTTP de la API (p. ej. 400 cuando se pide una página inexistente). */
+export class WPApiError extends Error {
+  constructor(
+    readonly status: number,
+    endpoint: string,
+  ) {
+    super(`WP API Error ${status}: ${endpoint}`);
+    this.name = "WPApiError";
+  }
 }
 
 function clampInteger(value: number, min: number, max: number): number {
@@ -87,26 +119,28 @@ function clampInteger(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.trunc(value)));
 }
 
-function createWpUrl(endpoint: string, params?: Record<string, string>): URL {
-  const url = new URL(`${getApiBase()}${endpoint}`);
-
-  Object.entries(params ?? {}).forEach(([key, value]) => {
-    url.searchParams.set(key, value);
-  });
-
-  return url;
+function timeoutSignal(): AbortSignal | undefined {
+  return typeof AbortSignal.timeout === "function"
+    ? AbortSignal.timeout(requestTimeoutMs)
+    : undefined;
 }
 
 async function wpRequest<T>(
   endpoint: string,
-  params?: Record<string, string>,
+  params: Record<string, string> = {},
 ): Promise<{ data: T; response: Response }> {
-  const response = await fetch(createWpUrl(endpoint, params), {
+  const url = new URL(`${apiBase}${endpoint}`);
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  const response = await fetch(url, {
     headers: { Accept: "application/json" },
+    signal: timeoutSignal(),
   });
 
   if (!response.ok) {
-    throw new Error(`WP API Error ${response.status}: ${endpoint}`);
+    throw new WPApiError(response.status, endpoint);
   }
 
   return { data: (await response.json()) as T, response };
@@ -120,57 +154,46 @@ async function wpFetch<T>(
   return data;
 }
 
-/** Obtiene publicaciones con imágenes y categorías embebidas. */
-export async function getPosts(perPage = 10, page = 1): Promise<WPPost[]> {
-  return wpFetch<WPPost[]>("/wp/v2/posts", {
+function readCountHeader(response: Response, name: string): number {
+  const value = Number(response.headers.get(name));
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+/** Obtiene una página de artículos (sin contenido) y el total de páginas. */
+export async function getPosts(perPage = 10, page = 1): Promise<PostsPage> {
+  const { data, response } = await wpRequest<WPPost[]>("/wp/v2/posts", {
     per_page: String(clampInteger(perPage, 1, maxPerPage)),
-    page: String(clampInteger(page, 1, maxPostPages)),
-    _embed: "1",
-  });
-}
-
-/** Obtiene todas las publicaciones disponibles para páginas estáticas. */
-export async function getAllPosts(): Promise<WPPost[]> {
-  const posts: WPPost[] = [];
-
-  for (let page = 1; page <= maxPostPages; page += 1) {
-    const { data, response } = await wpRequest<WPPost[]>("/wp/v2/posts", {
-      per_page: String(maxPerPage),
-      page: String(page),
-      _embed: "1",
-    });
-
-    posts.push(...data);
-
-    const totalPages = Number(response.headers.get("X-WP-TotalPages"));
-    const isLastPage =
-      data.length < maxPerPage ||
-      (Number.isFinite(totalPages) && totalPages > 0 && page >= totalPages);
-
-    if (isLastPage) break;
-  }
-
-  return posts;
-}
-
-/** Obtiene una publicación por su slug. */
-export async function getPostBySlug(slug: string): Promise<WPPost | null> {
-  const posts = await wpFetch<WPPost[]>("/wp/v2/posts", {
-    slug,
-    _embed: "1",
+    page: String(Math.max(1, Math.trunc(page) || 1)),
+    _embed: "wp:featuredmedia",
+    _fields: postSummaryFields,
   });
 
-  return posts[0] ?? null;
+  return {
+    posts: data,
+    total: readCountHeader(response, "X-WP-Total"),
+    totalPages: Math.max(1, readCountHeader(response, "X-WP-TotalPages")),
+  };
 }
 
 /** Obtiene los últimos N artículos para la portada. */
 export async function getLatestPosts(count = 3): Promise<WPPost[]> {
-  return getPosts(count, 1);
+  const { posts } = await getPosts(count, 1);
+  return posts;
 }
 
-/** Obtiene las categorías que contienen publicaciones. */
-export async function getCategories(): Promise<WPCategory[]> {
-  return wpFetch<WPCategory[]>("/wp/v2/categories", { hide_empty: "true" });
+/** Obtiene un artículo completo por su slug. */
+export async function getPostBySlug(slug: string): Promise<WPPost | null> {
+  const posts = await wpFetch<WPPost[]>("/wp/v2/posts", {
+    slug,
+    _embed: "wp:featuredmedia",
+  });
+
+  const wanted = safeDecode(slug).toLowerCase();
+  return (
+    posts.find((post) => safeDecode(post.slug).toLowerCase() === wanted) ??
+    posts[0] ??
+    null
+  );
 }
 
 /** Obtiene los proyectos del CPT portfolio. */
@@ -192,16 +215,7 @@ export async function getSkills(): Promise<Skill[]> {
   });
 }
 
-/** Agrupa habilidades por categoría de ACF. */
-export function groupSkillsByCategory(skills: Skill[]): Record<string, Skill[]> {
-  return skills.reduce<Record<string, Skill[]>>((groups, skill) => {
-    const category = skill.acf?.category?.trim() || "Otros";
-    (groups[category] ??= []).push(skill);
-    return groups;
-  }, {});
-}
-
-/** Obtiene la experiencia laboral de más reciente a más antigua. */
+/** Obtiene la experiencia laboral. */
 export async function getExperiences(): Promise<Experience[]> {
   return wpFetch<Experience[]>("/wp/v2/experience", {
     per_page: String(maxPerPage),
@@ -211,8 +225,78 @@ export async function getExperiences(): Promise<Experience[]> {
   });
 }
 
-/** Formatea una fecha YYYY-MM en español. */
-export function formatDate(dateString: string): string {
+/** Agrupa habilidades por su categoría de ACF, conservando el orden. */
+export function groupSkillsByCategory(skills: Skill[]): [string, Skill[]][] {
+  const groups = new Map<string, Skill[]>();
+
+  skills.forEach((skill) => {
+    const category = stripHtml(acfText(skill.acf?.category)) || "Otros";
+    const group = groups.get(category);
+    if (group) group.push(skill);
+    else groups.set(category, [skill]);
+  });
+
+  return Array.from(groups);
+}
+
+/** Valor de texto de un campo ACF ("" si está vacío o no es texto/número). */
+export function acfText(value: AcfValue): string {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return "";
+}
+
+/** Decodifica un segmento de URL sin lanzar errores con valores inválidos. */
+export function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+/** URL pública de un artículo del blog. */
+export function getPostUrl(post: Pick<WPPost, "slug">): string {
+  return `/blog/${encodeURIComponent(safeDecode(post.slug))}`;
+}
+
+/** Convierte HTML de WordPress en texto plano (decodifica entidades). */
+export function stripHtml(html: string): string {
+  if (!html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
+}
+
+/** Devuelve la URL solo si es http(s); descarta valores como "#" o "javascript:". */
+export function toSafeUrl(value: AcfValue): string | null {
+  const trimmed = acfText(value);
+  if (!trimmed || trimmed === "#") return null;
+
+  try {
+    const url = new URL(trimmed, window.location.origin);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Formatea la fecha de publicación de un artículo ("8 de octubre de 2026"). */
+export function formatPostDate(value: string): string {
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? ""
+    : new Intl.DateTimeFormat("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+}
+
+/** Formatea una fecha YYYY-MM en español ("ene 2024"). */
+export function formatYearMonth(dateString: string): string {
   if (!dateString) return "";
   if (dateString.toLowerCase() === "presente") return "Presente";
 
@@ -227,19 +311,36 @@ export function formatDate(dateString: string): string {
       });
 }
 
-/** Extrae la URL de la imagen destacada de una publicación embebida. */
-export function getFeaturedImage(post: WPPost): string {
-  return post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? "";
+/**
+ * Imagen destacada de un artículo, con `srcset` a partir de los tamaños que
+ * genera WordPress (se omiten los recortes con otra proporción).
+ */
+export function getFeaturedImage(post: WPPost): ImageSource | null {
+  const media = post._embedded?.["wp:featuredmedia"]?.[0];
+  if (!media?.source_url) return null;
+
+  const width = media.media_details?.width;
+  const height = media.media_details?.height;
+  const ratio = width && height ? width / height : 0;
+
+  const candidates = Object.values(media.media_details?.sizes ?? {})
+    .filter((size) => size.source_url && size.width > 0 && size.height > 0)
+    .filter(
+      (size) => !ratio || Math.abs(size.width / size.height - ratio) < 0.02,
+    )
+    .sort((a, b) => a.width - b.width);
+
+  const byWidth = new Map(candidates.map((size) => [size.width, size]));
+  const srcset = Array.from(byWidth.values())
+    .map((size) => `${size.source_url} ${size.width}w`)
+    .join(", ");
+
+  return { src: media.source_url, srcset, width, height };
 }
 
-/** Elimina las etiquetas HTML del contenido corto de WordPress. */
-export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, "").trim();
-}
-
-/** Convierte una lista de tecnologías separada por comas en elementos individuales. */
-export function parseTechs(technologyString: string): string[] {
-  return technologyString
+/** Convierte una lista de tecnologías separada por comas en elementos. */
+export function parseTechs(technologies: AcfValue): string[] {
+  return acfText(technologies)
     .split(",")
     .map((technology) => technology.trim())
     .filter(Boolean);

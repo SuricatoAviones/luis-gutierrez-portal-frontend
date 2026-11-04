@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { readFileSync, readdirSync, writeFileSync, statSync } from 'node:fs';
@@ -44,7 +44,45 @@ function inlineCss() {
   };
 }
 
+// En producción, public/.htaccess reescribe /blog/<slug> hacia la plantilla
+// /blog/post/ (el artículo se carga en el navegador). Esto replica esa regla
+// en `astro dev` para que las URLs de artículos funcionen en local.
+function blogSlugDevRewrite() {
+  return {
+    name: 'blog-slug-dev-rewrite',
+    hooks: {
+      'astro:server:setup': ({ server }) => {
+        server.middlewares.use((req, _res, next) => {
+          const [pathname, query] = (req.url ?? '').split('?');
+          const match = pathname.match(/^\/blog\/([^/.]+)\/?$/);
+
+          if (req.method === 'GET' && match && match[1] !== 'post') {
+            req.url = query ? `/blog/post/?${query}` : '/blog/post/';
+          }
+
+          next();
+        });
+      },
+    },
+  };
+}
+
 export default defineConfig({
+  env: {
+    schema: {
+      // Se incrusta en el JS del navegador: el contenido se consulta en cliente.
+      WP_API_URL: envField.string({
+        context: 'client',
+        access: 'public',
+        url: true,
+      }),
+      CF7_FORM_ID: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+    },
+  },
   integrations: [
     sitemap({
       filter: (page) => {
@@ -53,6 +91,7 @@ export default defineConfig({
       },
     }),
     inlineCss(),
+    blogSlugDevRewrite(),
   ],
   vite: {
     plugins: [tailwindcss()],
